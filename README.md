@@ -20,6 +20,43 @@ It is *not* a Mirth replacement. It is a **modern operations layer** that sits i
 
 ---
 
+## Screenshots
+
+### Dashboard — grouped by clinical interface
+Channels bucketed into clinical workflows (ADT, Results, Orders, Pharmacy, Claims, etc.) with per-bucket health (started count, throughput, errors, queue). Live sparklines on the hottest channels.
+
+![Dashboard](docs/screenshots/01-dashboard.png)
+
+### Channel detail — pipeline visualization with failure location
+Source → Source Filter → Source Transformer → Destinations laid out as a colored pipeline. Each stage tells you its health (green/amber/red/idle). When something breaks, the **Failures in the last N messages** panel tells you *which connector* and *which stage* (filter, transformer, dispatch, response). Recent error payloads inline.
+
+![Channel detail with pipeline + failure breakdown](docs/screenshots/03-channel-detail.png)
+
+### Transformer & filter editor
+CodeMirror 6 with JS syntax highlighting against the real channel scripts. Sidebar navigates every script slot: source transformer/filter, per-destination transformer/response/filter, plus channel-level preprocessor/postprocessor/deploy/undeploy. Save sends a real PUT to Mirth and optionally redeploys.
+
+![Scripts editor](docs/screenshots/04-scripts-editor.png)
+
+### Message browser
+Recent messages per channel, expandable to show every connector's raw/transformed/encoded/response payload in tabbed dark code panels. Status badges per connector make failures obvious.
+
+![Message browser](docs/screenshots/05-message-browser.png)
+
+### Channels list with search/filter/export
+Search across name/id/description/destination, filter by state and source type, sortable columns, one-click CSV export for offline review.
+
+![Channels list](docs/screenshots/02-channels-list.png)
+
+### Mappings (Configuration Map editor)
+Full CRUD over Mirth's server-level key/value store that channels reference via `configurationMap.get('FACILITY_NPI')`. Edit safely — merges with existing entries, never overwrites them.
+
+![Mappings](docs/screenshots/06-mappings.png)
+
+### New channel from templates
+MLLP listener / HTTP listener / Channel Writer templates. Pick one, fill name/port/destination, hit Create + Deploy — the console builds Mirth-compatible XML, imports it, enables it, and deploys.
+
+![New channel](docs/screenshots/07-new-channel.png)
+
 ## What you get
 
 - **🖥️ Browser admin.** Channel list, channel detail with source → transformer → destinations flow, runtime statistics. No Java client.

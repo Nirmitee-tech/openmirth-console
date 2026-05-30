@@ -40,10 +40,12 @@ export default defineConfig({
       include: [
         "lib/env.ts",
         "lib/csv.ts",
+        "lib/interface-classifier.ts",
         "lib/request-context.ts",
         "lib/auth/roles.ts",
         "lib/auth/role-resolver.ts",
         "lib/mirth/errors.ts",
+        "lib/mirth/failure-analysis.ts",
         "lib/mirth/messages.ts",
         "lib/mirth/parser.ts",
         "lib/mirth/schemas.ts",

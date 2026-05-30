@@ -74,12 +74,40 @@ function extractContent(connectorXml: string, tag: string): string | null {
   return m ? unescapeXml(m[1]) : null
 }
 
+/**
+ * Walk the XML once tracking <message>...</message> open/close depth, and
+ * only capture the OUTER blocks. The naive regex /<message>...<\/message>/
+ * also matches <message> tags nested inside connector <response> payloads
+ * (Mirth's HL7v2 ACK responses serialize using this tag), which spawns
+ * phantom "0 connectors" rows in the UI.
+ */
 export function parseMessages(xml: string): MirthMessage[] {
   const out: MirthMessage[] = []
-  const msgRe = /<message>([\s\S]*?)<\/message>/g
-  let mm: RegExpExecArray | null
-  while ((mm = msgRe.exec(xml)) !== null) {
-    const body = mm[1]
+  let depth = 0
+  let start = -1
+  let i = 0
+  while (i < xml.length) {
+    if (xml.startsWith("<message>", i)) {
+      if (depth === 0) start = i + "<message>".length
+      depth++
+      i += "<message>".length
+      continue
+    }
+    if (xml.startsWith("</message>", i)) {
+      depth--
+      if (depth === 0 && start >= 0) {
+        parseOneMessage(xml.slice(start, i), out)
+        start = -1
+      }
+      i += "</message>".length
+      continue
+    }
+    i++
+  }
+  return out
+}
+
+function parseOneMessage(body: string, out: MirthMessage[]): void {
     const messageId =
       /<messageId>(\d+)<\/messageId>/.exec(body)?.[1] ?? "?"
     const receivedAt = parseInt(
@@ -122,6 +150,4 @@ export function parseMessages(xml: string): MirthMessage[] {
     connectors.sort((a, b) => a.metaDataId - b.metaDataId)
 
     out.push({ messageId, receivedAt, processed, connectors })
-  }
-  return out
 }
