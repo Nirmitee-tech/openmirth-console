@@ -8,7 +8,13 @@ import {
   MirthSchemaError,
   MirthUnreachableError,
 } from "./errors"
-import { parseChannels, parseStatuses } from "./parser"
+import {
+  mergeChannelMetadata,
+  parseChannels,
+  parseConfigurationMap,
+  parseStatuses,
+  serializeConfigurationMap,
+} from "./parser"
 import {
   type Channel,
   type ChannelWithStatus,
@@ -131,6 +137,73 @@ export class MirthClient {
     return all.find((c) => c.id === channelId) ?? null
   }
 
+  // ── Channel lifecycle mutations ───────────────────────────────────────
+
+  async startChannel(channelId: string): Promise<void> {
+    await this.post(`/api/channels/${encodeURIComponent(channelId)}/_start`)
+  }
+  async stopChannel(channelId: string): Promise<void> {
+    await this.post(`/api/channels/${encodeURIComponent(channelId)}/_stop`)
+  }
+  async pauseChannel(channelId: string): Promise<void> {
+    await this.post(`/api/channels/${encodeURIComponent(channelId)}/_pause`)
+  }
+  async resumeChannel(channelId: string): Promise<void> {
+    await this.post(`/api/channels/${encodeURIComponent(channelId)}/_resume`)
+  }
+  async haltChannel(channelId: string): Promise<void> {
+    await this.post(`/api/channels/${encodeURIComponent(channelId)}/_halt`)
+  }
+  async deployChannel(channelId: string): Promise<void> {
+    await this.post(`/api/channels/${encodeURIComponent(channelId)}/_deploy`)
+  }
+  async undeployChannel(channelId: string): Promise<void> {
+    await this.post(`/api/channels/${encodeURIComponent(channelId)}/_undeploy`)
+  }
+  async redeployAll(): Promise<void> {
+    await this.post(`/api/channels/_redeployAll`)
+  }
+
+  /**
+   * Create a channel from an already-serialized XStream XML body.
+   * Caller is responsible for producing valid XML — typically by
+   * cloning a known-good template and modifying fields.
+   */
+  async createChannel(channelXml: string): Promise<void> {
+    await this.post(`/api/channels`, channelXml, "application/xml")
+  }
+
+  /**
+   * Set the enabled flag on a channel via the channelMetadata map.
+   * Required after createChannel() before a _deploy will take effect.
+   *
+   * IMPORTANT: PUT /api/server/channelMetadata REPLACES the entire map.
+   * We must GET the existing map first, splice in / update our entry,
+   * and PUT the merged version back. Failing to do this wipes the
+   * metadata (initialState, pruning settings, enabled flag) for every
+   * other channel on the server — a critical production bug.
+   */
+  async setChannelEnabled(channelId: string, enabled: boolean): Promise<void> {
+    const currentXml = await this.text(`/api/server/channelMetadata`, {
+      accept: "application/xml",
+    })
+    const merged = mergeChannelMetadata(currentXml, channelId, enabled)
+    await this.put(`/api/server/channelMetadata`, merged, "application/xml")
+  }
+
+  // ── Configuration map (key/value lookups channels reference) ─────────
+
+  async getConfigurationMap(): Promise<Record<string, string>> {
+    const xml = await this.text(`/api/server/configurationMap`, {
+      accept: "application/xml",
+    })
+    return parseConfigurationMap(xml)
+  }
+
+  async setConfigurationMap(entries: Record<string, string>): Promise<void> {
+    await this.put(`/api/server/configurationMap`, serializeConfigurationMap(entries), "application/xml")
+  }
+
   // ── Internals ─────────────────────────────────────────────────────────
 
   private async login(): Promise<void> {
@@ -186,6 +259,109 @@ export class MirthClient {
     }
     this.cookieHeader = sessionMatch[0]
     log.debug("Mirth login successful")
+  }
+
+  private async post(
+    path: string,
+    body?: string,
+    contentType = "application/x-www-form-urlencoded"
+  ): Promise<void> {
+    if (!this.cookieHeader) await this.login()
+    const url = `${this.baseUrl}${path}`
+    const headers: Record<string, string> = {
+      "X-Requested-With": "OpenMirthConsole",
+      Accept: "application/json",
+      Cookie: this.cookieHeader!,
+    }
+    if (body !== undefined) headers["Content-Type"] = contentType
+
+    let resp: Response
+    try {
+      resp = await fetch(url, {
+        method: "POST",
+        body,
+        headers,
+        // @ts-expect-error: undici dispatcher accepted by Node fetch
+        dispatcher: this.dispatcher,
+      })
+    } catch (e) {
+      throw new MirthUnreachableError(`Cannot reach ${url}`, e)
+    }
+
+    if (resp.status === 401) {
+      this.cookieHeader = null
+      await this.login()
+      headers.Cookie = this.cookieHeader!
+      try {
+        resp = await fetch(url, {
+          method: "POST",
+          body,
+          headers,
+          // @ts-expect-error: dispatcher
+          dispatcher: this.dispatcher,
+        })
+      } catch (e) {
+        throw new MirthUnreachableError(`Cannot reach ${url}`, e)
+      }
+    }
+
+    if (!resp.ok) {
+      throw new MirthApiError(
+        `Mirth POST ${path} returned ${resp.status}`,
+        resp.status,
+        await safeReadBody(resp)
+      )
+    }
+  }
+
+  private async put(
+    path: string,
+    body: string,
+    contentType = "application/xml"
+  ): Promise<void> {
+    if (!this.cookieHeader) await this.login()
+    const url = `${this.baseUrl}${path}`
+    const headers: Record<string, string> = {
+      "X-Requested-With": "OpenMirthConsole",
+      "Content-Type": contentType,
+      Accept: "application/json",
+      Cookie: this.cookieHeader!,
+    }
+    let resp: Response
+    try {
+      resp = await fetch(url, {
+        method: "PUT",
+        body,
+        headers,
+        // @ts-expect-error: dispatcher
+        dispatcher: this.dispatcher,
+      })
+    } catch (e) {
+      throw new MirthUnreachableError(`Cannot reach ${url}`, e)
+    }
+    if (resp.status === 401) {
+      this.cookieHeader = null
+      await this.login()
+      headers.Cookie = this.cookieHeader!
+      try {
+        resp = await fetch(url, {
+          method: "PUT",
+          body,
+          headers,
+          // @ts-expect-error: dispatcher
+          dispatcher: this.dispatcher,
+        })
+      } catch (e) {
+        throw new MirthUnreachableError(`Cannot reach ${url}`, e)
+      }
+    }
+    if (!resp.ok) {
+      throw new MirthApiError(
+        `Mirth PUT ${path} returned ${resp.status}`,
+        resp.status,
+        await safeReadBody(resp)
+      )
+    }
   }
 
   private async text(

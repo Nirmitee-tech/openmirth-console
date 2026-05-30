@@ -19,6 +19,8 @@ export function Header({ username, role }: HeaderProps) {
           <nav className="hidden md:flex items-center gap-1 text-sm">
             <NavLink href="/">Dashboard</NavLink>
             <NavLink href="/channels">Channels</NavLink>
+            <NavLink href="/channels/new">New Channel</NavLink>
+            <NavLink href="/mappings">Mappings</NavLink>
             <NavLink href="/catalog">Catalog</NavLink>
             <NavLink href="/observability">Observability</NavLink>
           </nav>

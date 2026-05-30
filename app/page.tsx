@@ -3,14 +3,19 @@ import { getMirthClient } from "@/lib/mirth/client"
 import { MirthError } from "@/lib/mirth/errors"
 import { StatCard } from "@/components/StatCard"
 import { StateBadge } from "@/components/StateBadge"
+import { Sparkline } from "@/components/Sparkline"
 import { childLogger } from "@/lib/logger"
+import { ensureSampler, getHistory } from "@/lib/timeseries"
 import type { ChannelWithStatus } from "@/lib/mirth/schemas"
 
 const log = childLogger({ component: "dashboard-page" })
 
-export const dynamic = "force-dynamic"  // always live data
+export const dynamic = "force-dynamic"
 
 export default async function Dashboard() {
+  // Ensure the throughput sampler is running (idempotent).
+  ensureSampler()
+
   let channels: ChannelWithStatus[]
   let version: string | null = null
   let error: string | null = null
@@ -41,13 +46,39 @@ export default async function Dashboard() {
     { received: 0, sent: 0, errored: 0, queued: 0, started: 0 }
   )
 
+  // Hottest channels for the live overview — sort by queue depth desc,
+  // then by error count desc, then by rate.
+  const hottest = channels
+    .slice()
+    .sort(
+      (a, b) =>
+        b.statistics.queued - a.statistics.queued ||
+        b.statistics.errored - a.statistics.errored ||
+        b.statistics.received - a.statistics.received
+    )
+    .slice(0, 8)
+
+  const errorChannels = channels.filter((c) => c.statistics.errored > 0)
+  const downChannels = channels.filter(
+    (c) => c.state !== "STARTED" && c.state !== "PAUSED"
+  )
+
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-semibold text-ink-900">Dashboard</h1>
-        <p className="text-sm text-ink-600 mt-1">
-          Live view from Mirth Connect{version ? ` ${version}` : ""}. Updates on every page load.
-        </p>
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-ink-900">Dashboard</h1>
+          <p className="text-sm text-ink-600 mt-1">
+            Live view from Mirth Connect{version ? ` ${version}` : ""}. Sparklines show the
+            last ~5 minutes of throughput, sampled every 10 seconds in-process.
+          </p>
+        </div>
+        <Link
+          href="/channels"
+          className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+        >
+          All channels →
+        </Link>
       </header>
 
       {error ? (
@@ -81,44 +112,71 @@ export default async function Dashboard() {
         />
       </section>
 
+      <section className="grid lg:grid-cols-2 gap-6">
+        <Panel title="Channels with errors" empty="No channels are reporting errors. 🎉">
+          {errorChannels.length === 0 ? null : (
+            <ul className="divide-y divide-ink-100">
+              {errorChannels.slice(0, 8).map((c) => (
+                <li key={c.id} className="py-2 flex items-center justify-between gap-3">
+                  <Link
+                    href={`/channels/${c.id}`}
+                    className="text-sm font-medium text-brand-500 hover:underline underline-offset-4 truncate"
+                  >
+                    {c.name}
+                  </Link>
+                  <span className="text-xs text-red-700 font-semibold tabular-nums">
+                    {c.statistics.errored} errored
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+
+        <Panel title="Channels not running" empty="All channels are STARTED.">
+          {downChannels.length === 0 ? null : (
+            <ul className="divide-y divide-ink-100">
+              {downChannels.slice(0, 8).map((c) => (
+                <li key={c.id} className="py-2 flex items-center justify-between gap-3">
+                  <Link
+                    href={`/channels/${c.id}`}
+                    className="text-sm font-medium text-brand-500 hover:underline underline-offset-4 truncate"
+                  >
+                    {c.name}
+                  </Link>
+                  <StateBadge state={c.state} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+      </section>
+
       <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-ink-900">Channels</h2>
-          <Link
-            href="/channels"
-            className="text-sm text-brand-500 hover:underline underline-offset-4"
-          >
-            View all →
-          </Link>
-        </div>
+        <h2 className="text-lg font-semibold text-ink-900 mb-3">Hottest channels</h2>
         <div className="bg-white rounded-lg border border-ink-200 overflow-hidden">
           <table className="dense w-full">
             <thead>
               <tr>
-                <th>Name</th>
+                <th>Channel</th>
                 <th>State</th>
+                <th className="w-[160px]">Throughput (5m)</th>
                 <th className="text-right">Received</th>
                 <th className="text-right">Errors</th>
                 <th className="text-right">Queued</th>
               </tr>
             </thead>
             <tbody>
-              {channels.length === 0 && !error ? (
+              {hottest.length === 0 && !error ? (
                 <tr>
-                  <td colSpan={5} className="text-center text-ink-600 py-8">
+                  <td colSpan={6} className="text-center text-ink-600 py-8">
                     No channels found.
                   </td>
                 </tr>
               ) : null}
-              {channels
-                .slice()
-                .sort(
-                  (a, b) =>
-                    (b.statistics.queued || 0) - (a.statistics.queued || 0) ||
-                    a.name.localeCompare(b.name)
-                )
-                .slice(0, 10)
-                .map((c) => (
+              {hottest.map((c) => {
+                const history = getHistory(c.id)
+                return (
                   <tr key={c.id}>
                     <td>
                       <Link
@@ -130,6 +188,20 @@ export default async function Dashboard() {
                     </td>
                     <td>
                       <StateBadge state={c.state} />
+                    </td>
+                    <td>
+                      {history && history.rates.length > 1 ? (
+                        <Sparkline
+                          values={history.rates}
+                          width={140}
+                          height={28}
+                          ariaLabel={`Throughput sparkline for ${c.name}`}
+                        />
+                      ) : (
+                        <span className="text-xs text-ink-400 italic">
+                          collecting…
+                        </span>
+                      )}
                     </td>
                     <td className="text-right tabular-nums">
                       {c.statistics.received.toLocaleString()}
@@ -151,11 +223,29 @@ export default async function Dashboard() {
                       {c.statistics.queued}
                     </td>
                   </tr>
-                ))}
+                )
+              })}
             </tbody>
           </table>
         </div>
       </section>
+    </div>
+  )
+}
+
+function Panel({
+  title,
+  children,
+  empty,
+}: {
+  title: string
+  children: React.ReactNode
+  empty: string
+}) {
+  return (
+    <div className="bg-white rounded-lg border border-ink-200 p-4">
+      <h3 className="text-sm font-semibold text-ink-900 mb-2">{title}</h3>
+      {children ?? <div className="text-sm text-ink-600">{empty}</div>}
     </div>
   )
 }

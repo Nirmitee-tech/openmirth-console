@@ -39,12 +39,14 @@ export default defineConfig({
       // or live Mirth are covered by integration + E2E tests, not here.
       include: [
         "lib/env.ts",
+        "lib/csv.ts",
         "lib/request-context.ts",
         "lib/auth/roles.ts",
         "lib/auth/role-resolver.ts",
         "lib/mirth/errors.ts",
         "lib/mirth/parser.ts",
         "lib/mirth/schemas.ts",
+        "lib/mirth/templates.ts",
       ],
       exclude: ["**/*.d.ts"],
       thresholds: {

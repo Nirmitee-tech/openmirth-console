@@ -224,5 +224,184 @@ export function parseChannels(xml: string): Channel[] {
   return channels
 }
 
+/**
+ * Mirth Configuration Map XML <-> Record<string,string>.
+ *
+ * The map is a server-level key/value lookup channels can reference via
+ * configurationMap.get('foo'). Mirth stores values as ConfigurationProperty
+ * elements with optional comments — we drop the comments on read for now;
+ * round-tripping comments is a Phase 2 feature.
+ *
+ * Shape:
+ *   <map>
+ *     <entry>
+ *       <string>FACILITY_NPI</string>
+ *       <com.mirth.connect.util.ConfigurationProperty>
+ *         <value>1234567890</value>
+ *         <comment>NPI for the main facility</comment>
+ *       </com.mirth.connect.util.ConfigurationProperty>
+ *     </entry>
+ *   </map>
+ */
+export function parseConfigurationMap(xml: string): Record<string, string> {
+  let parsed: unknown
+  try {
+    parsed = xmlParser.parse(xml)
+  } catch (e) {
+    throw new MirthSchemaError("Failed to parse configurationMap XML", e, e)
+  }
+  const root = (parsed as { map?: { entry?: unknown } })?.map
+  if (!root) return {}
+  const entries = Array.isArray(root.entry) ? root.entry : []
+  const out: Record<string, string> = {}
+  for (const e of entries as Array<Record<string, unknown>>) {
+    const key = typeof e.string === "string" ? e.string : null
+    if (!key) continue
+    const prop = e["com.mirth.connect.util.ConfigurationProperty"] as
+      | { value?: unknown }
+      | undefined
+    const value =
+      typeof prop?.value === "string"
+        ? prop.value
+        : prop?.value !== undefined
+          ? String(prop.value)
+          : ""
+    out[key] = value
+  }
+  return out
+}
+
+function escapeXml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;")
+}
+
+export function serializeConfigurationMap(entries: Record<string, string>): string {
+  const body = Object.entries(entries)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(
+      ([k, v]) =>
+        `  <entry>\n` +
+        `    <string>${escapeXml(k)}</string>\n` +
+        `    <com.mirth.connect.util.ConfigurationProperty>\n` +
+        `      <value>${escapeXml(v)}</value>\n` +
+        `      <comment></comment>\n` +
+        `    </com.mirth.connect.util.ConfigurationProperty>\n` +
+        `  </entry>`
+    )
+    .join("\n")
+  return `<map>\n${body}\n</map>\n`
+}
+
+/**
+ * Channel metadata merge — preserve every existing entry and add/update
+ * the one we care about. Mirth's PUT /api/server/channelMetadata fully
+ * REPLACES the stored map, so naively sending a single-entry map wipes
+ * the enabled flag and pruning settings for every other channel.
+ *
+ * We parse the existing XML, mutate the target entry (or append a new
+ * one with sane defaults), and re-serialize. Other entries are
+ * passed through structurally unchanged.
+ */
+interface ChannelMetadataEntry {
+  channelId: string
+  enabled: boolean
+  pruneMetaDataDays: number
+  pruneContentDays: number
+  archiveEnabled: boolean
+  lastModifiedTime: string
+  lastModifiedTimezone: string
+}
+
+function parseChannelMetadataMap(xml: string): ChannelMetadataEntry[] {
+  let parsed: unknown
+  try {
+    parsed = xmlParser.parse(xml)
+  } catch (e) {
+    throw new MirthSchemaError("Failed to parse channelMetadata XML", e, e)
+  }
+  const root = (parsed as { map?: { entry?: unknown } })?.map
+  if (!root) return []
+  const entries = Array.isArray(root.entry) ? root.entry : []
+  const out: ChannelMetadataEntry[] = []
+  for (const e of entries as Array<Record<string, unknown>>) {
+    const channelId = typeof e.string === "string" ? e.string : null
+    if (!channelId) continue
+    const meta = e["com.mirth.connect.model.ChannelMetadata"] as
+      | Record<string, unknown>
+      | undefined
+    if (!meta) continue
+    const pruning = meta.pruningSettings as Record<string, unknown> | undefined
+    const lastModified = meta.lastModified as Record<string, unknown> | undefined
+    out.push({
+      channelId,
+      enabled: meta.enabled === true || meta.enabled === "true",
+      pruneMetaDataDays:
+        typeof pruning?.pruneMetaDataDays === "number"
+          ? pruning.pruneMetaDataDays
+          : Number(pruning?.pruneMetaDataDays ?? 30),
+      pruneContentDays:
+        typeof pruning?.pruneContentDays === "number"
+          ? pruning.pruneContentDays
+          : Number(pruning?.pruneContentDays ?? 30),
+      archiveEnabled: pruning?.archiveEnabled === true || pruning?.archiveEnabled === "true",
+      lastModifiedTime: String(lastModified?.time ?? "0"),
+      lastModifiedTimezone: String(lastModified?.timezone ?? "UTC"),
+    })
+  }
+  return out
+}
+
+function serializeChannelMetadataMap(entries: ChannelMetadataEntry[]): string {
+  const body = entries
+    .map(
+      (e) =>
+        `  <entry>\n` +
+        `    <string>${e.channelId}</string>\n` +
+        `    <com.mirth.connect.model.ChannelMetadata>\n` +
+        `      <enabled>${e.enabled ? "true" : "false"}</enabled>\n` +
+        `      <lastModified>\n` +
+        `        <time>${e.lastModifiedTime}</time>\n` +
+        `        <timezone>${e.lastModifiedTimezone}</timezone>\n` +
+        `      </lastModified>\n` +
+        `      <pruningSettings>\n` +
+        `        <pruneMetaDataDays>${e.pruneMetaDataDays}</pruneMetaDataDays>\n` +
+        `        <pruneContentDays>${e.pruneContentDays}</pruneContentDays>\n` +
+        `        <archiveEnabled>${e.archiveEnabled ? "true" : "false"}</archiveEnabled>\n` +
+        `      </pruningSettings>\n` +
+        `    </com.mirth.connect.model.ChannelMetadata>\n` +
+        `  </entry>`
+    )
+    .join("\n")
+  return `<map>\n${body}\n</map>\n`
+}
+
+export function mergeChannelMetadata(
+  currentXml: string,
+  channelId: string,
+  enabled: boolean
+): string {
+  const entries = parseChannelMetadataMap(currentXml)
+  const existing = entries.find((e) => e.channelId === channelId)
+  if (existing) {
+    existing.enabled = enabled
+  } else {
+    entries.push({
+      channelId,
+      enabled,
+      pruneMetaDataDays: 30,
+      pruneContentDays: 30,
+      archiveEnabled: false,
+      lastModifiedTime: "0",
+      lastModifiedTimezone: "UTC",
+    })
+  }
+  return serializeChannelMetadataMap(entries)
+}
+
 /** Exposed for unit testing of the state parser */
 export const _internal = { ChannelStateSchema, extractStatistics }
