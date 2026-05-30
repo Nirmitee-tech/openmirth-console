@@ -98,4 +98,4 @@ Items deliberately out of scope for v0.1:
 4. **Git-backed channel storage** — auto-export on save, PR-based promotion.
 5. **Multi-engine adapter** — pluggable backends for OIE, BridgeLink, and (eventually) Rhapsody migration tooling.
 6. **Plugin marketplace** — community channel templates, dashboard widgets, transformers.
-7. **Agentic AI co-pilot** — per-channel AI panels, anomaly explanations, debug suggestions (RaptorX integration).
+7. **Agentic AI co-pilot** — per-channel AI panels, anomaly explanations, debug suggestions.

@@ -196,7 +196,7 @@ OpenMirth Console is developed by [**Nirmitee.io**](https://nirmitee.io?utm_sour
 - **Mirth Connect** deployment, custom channels, and upgrades
 - **HL7v2, FHIR R4, ABDM, TEFCA** integration and conformance
 - **Cloverleaf / Rhapsody → Mirth** migration engagements
-- **Healthcare-AI** with the [RaptorX.ai](https://raptorx.ai) agentic platform
+- **Healthcare AI / agentic workflows** layered on clinical event streams
 
 We also publish the [**Mirth Connect Cookbook**](https://github.com/Nirmitee-tech/mirth-connect-cookbook) — 50+ production-grade recipes for HL7v2 transformers, FHIR pipelines, observability stacks, and channel patterns. OpenMirth Console integrates with several of those recipes natively.
 
