@@ -52,11 +52,18 @@ export function middleware(req: NextRequest): NextResponse {
   response.headers.set("X-Frame-Options", "DENY")
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+  // Next.js dev (Webpack HMR + React Refresh) requires 'unsafe-eval' for
+  // its module hot-reload runtime. In production builds Next's runtime is
+  // pre-compiled and 'unsafe-eval' is forbidden.
+  const isDev = process.env.NODE_ENV !== "production"
+  const scriptSrc = isDev
+    ? "'self' 'unsafe-inline' 'unsafe-eval'"
+    : "'self' 'unsafe-inline'"
   response.headers.set(
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'", // Next inline runtime requires unsafe-inline
+      `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
@@ -76,7 +83,18 @@ export function middleware(req: NextRequest): NextResponse {
 
   if (!isPublic(req.nextUrl.pathname) && !hasCookie && !req.nextUrl.pathname.startsWith("/api/")) {
     const loginUrl = new URL("/login", req.url)
-    loginUrl.searchParams.set("next", req.nextUrl.pathname + req.nextUrl.search)
+    const candidate = req.nextUrl.pathname + req.nextUrl.search
+    // Strict local-only redirect: must start with single "/" and not be
+    // protocol-relative or backslash-escaped. Defends against an attacker
+    // crafting a request like /\evil.com that the login form would echo
+    // back as a redirect target.
+    const safe =
+      candidate.startsWith("/") &&
+      !candidate.startsWith("//") &&
+      !candidate.startsWith("/\\")
+        ? candidate
+        : "/"
+    loginUrl.searchParams.set("next", safe)
     return NextResponse.redirect(loginUrl)
   }
 

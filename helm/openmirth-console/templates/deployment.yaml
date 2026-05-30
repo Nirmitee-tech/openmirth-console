@@ -70,6 +70,12 @@ spec:
               value: {{ .Values.session.cookieName | quote }}
             - name: SESSION_TTL_SECONDS
               value: {{ .Values.session.ttlSeconds | quote }}
+            - name: OMCC_ROLE_ADMIN
+              value: {{ .Values.roles.admin | quote }}
+            - name: OMCC_ROLE_OPERATOR
+              value: {{ .Values.roles.operator | quote }}
+            - name: OMCC_ROLE_VIEWER
+              value: {{ .Values.roles.viewer | quote }}
             {{- if .Values.grafanaUrl }}
             - name: GRAFANA_URL
               value: {{ .Values.grafanaUrl | quote }}

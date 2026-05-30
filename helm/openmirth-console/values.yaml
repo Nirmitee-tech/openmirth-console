@@ -27,6 +27,15 @@ session:
   cookieName: "openmirth_session"
   ttlSeconds: 28800  # 8 hours
 
+# Role mapping (REQUIRED). Comma-separated usernames per tier; "*" wildcard
+# grants the tier to every authenticated user. Closed-world default —
+# users not in any tier are denied login. Highest tier wins for users in
+# multiple. See SECURITY.md for the threat model around this.
+roles:
+  admin: ""           # e.g., "alice,bob"
+  operator: ""        # e.g., "charlie,dave"
+  viewer: ""          # e.g., "*" to grant viewer to every authed user
+
 # Optional embed targets
 grafanaUrl: ""
 catalogUrl: ""

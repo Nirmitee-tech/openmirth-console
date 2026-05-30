@@ -11,7 +11,6 @@ test.describe("Authentication", () => {
     await page.goto("/login")
     await page.getByLabel("Username").fill("admin")
     await page.getByLabel("Password").fill("definitely-not-the-password")
-    await page.getByLabel("Role").selectOption("viewer")
     await page.getByRole("button", { name: /sign in/i }).click()
     await expect(page.getByText(/invalid credentials/i)).toBeVisible()
   })
@@ -20,11 +19,23 @@ test.describe("Authentication", () => {
     await page.goto("/login")
     await page.getByLabel("Username").fill("admin")
     await page.getByLabel("Password").fill("admin")
-    await page.getByLabel("Role").selectOption("admin")
     await page.getByRole("button", { name: /sign in/i }).click()
     await expect(page).toHaveURL("/")
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible()
     await expect(page.getByText(/STARTED/)).toBeVisible()
+  })
+
+  test("a user not in any OMCC_ROLE_* tier is denied", async ({ page }) => {
+    // The CI/demo Mirth has multiple bootstrap accounts; this username
+    // authenticates against Mirth but is not in OMCC_ROLE_ADMIN.
+    // The role-resolver returns granted:false → server redirects to
+    // /login?error=no_role.
+    await page.goto("/login")
+    await page.getByLabel("Username").fill("unmappeduser")
+    await page.getByLabel("Password").fill("anything")
+    await page.getByRole("button", { name: /sign in/i }).click()
+    // Either bad-creds or no-role — both must NOT land on /
+    await expect(page).not.toHaveURL("/")
   })
 
   test("logout clears the session", async ({ page, context }) => {

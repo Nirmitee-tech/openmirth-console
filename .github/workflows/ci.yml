@@ -141,6 +141,7 @@ jobs:
           MIRTH_USER: admin
           MIRTH_PASS: admin
           MIRTH_INSECURE_SKIP_VERIFY: "true"
+          OMCC_ROLE_ADMIN: admin
           PORT: 3030
           NODE_ENV: production
         run: |

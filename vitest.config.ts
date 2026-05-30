@@ -41,6 +41,7 @@ export default defineConfig({
         "lib/env.ts",
         "lib/request-context.ts",
         "lib/auth/roles.ts",
+        "lib/auth/role-resolver.ts",
         "lib/mirth/errors.ts",
         "lib/mirth/parser.ts",
         "lib/mirth/schemas.ts",

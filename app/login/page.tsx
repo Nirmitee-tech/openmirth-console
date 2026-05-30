@@ -5,21 +5,21 @@ import { LoginForm } from "./login-form"
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>
+  searchParams: Promise<{ next?: string; error?: string }>
 }) {
   const session = await getSession()
   if (session.username) {
     redirect("/")
   }
-  const { next } = await searchParams
+  const { next, error } = await searchParams
   return (
     <div className="max-w-md mx-auto mt-12">
       <h1 className="text-2xl font-semibold text-ink-900 mb-2">Sign in to OpenMirth Console</h1>
       <p className="text-sm text-ink-600 mb-6">
-        Use the same credentials configured on your Mirth Connect server. Your role
-        determines which actions you can take.
+        Use the credentials configured on your Mirth Connect server. Your role
+        is assigned server-side based on the deployment&apos;s role mapping.
       </p>
-      <LoginForm next={next} />
+      <LoginForm next={next} initialError={error ?? null} />
     </div>
   )
 }

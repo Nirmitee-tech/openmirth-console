@@ -59,6 +59,11 @@ services:
       MIRTH_PASS: admin
       # Local-demo only — production must use MIRTH_CA_FILE
       MIRTH_INSECURE_SKIP_VERIFY: "true"
+      # Role mapping for the demo: grant the bootstrap admin user the
+      # admin role; deny everyone else (closed-world default).
+      OMCC_ROLE_ADMIN: admin
+      OMCC_ROLE_OPERATOR: ""
+      OMCC_ROLE_VIEWER: ""
       NODE_ENV: production
       LOG_LEVEL: info
     ports:

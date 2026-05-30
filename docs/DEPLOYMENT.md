@@ -13,6 +13,7 @@ Run through this before exposing the console outside your local laptop.
 - [ ] `MIRTH_INSECURE_SKIP_VERIFY` is unset (the Helm chart blocks setting it true in production)
 - [ ] `NODE_ENV=production`
 - [ ] `LOG_LEVEL=info` (use `debug` only for incident triage)
+- [ ] `OMCC_ROLE_ADMIN`, `OMCC_ROLE_OPERATOR`, `OMCC_ROLE_VIEWER` are set per your team's role assignments. Closed-world default — users not in any tier are denied login.
 - [ ] `GRAFANA_URL` and `CATALOG_URL` are set if you want the embedded panels to work
 
 ### Network

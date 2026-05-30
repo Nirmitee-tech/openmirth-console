@@ -36,6 +36,19 @@ const Schema = z.object({
   SESSION_COOKIE_NAME: z.string().default("openmirth_session"),
   SESSION_TTL_SECONDS: z.coerce.number().int().positive().default(8 * 60 * 60),
 
+  // Role mapping. Comma-separated usernames per tier. A user not listed in
+  // any tier is denied login (closed-world default). Use "*" to grant a
+  // tier to every authenticated user (sensible default for the viewer tier
+  // in trusted environments).
+  //
+  // Example:
+  //   OMCC_ROLE_ADMIN=alice,bob
+  //   OMCC_ROLE_OPERATOR=charlie,dave
+  //   OMCC_ROLE_VIEWER=*
+  OMCC_ROLE_ADMIN: z.string().default(""),
+  OMCC_ROLE_OPERATOR: z.string().default(""),
+  OMCC_ROLE_VIEWER: z.string().default(""),
+
   // Optional embed targets
   GRAFANA_URL: z.string().url().optional(),
   CATALOG_URL: z.string().url().optional(),

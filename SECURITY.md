@@ -52,7 +52,8 @@ Out of scope (report upstream):
 | TLS MITM on Mirth REST channel | Per-request undici Agent with `MIRTH_CA_FILE` (preferred) or system trust store. `MIRTH_INSECURE_SKIP_VERIFY` is forbidden when `NODE_ENV=production`. |
 | XSS via channel names/descriptions in UI | React escapes all rendered text by default. CSP headers via middleware. |
 | Clickjacking of admin UI | `X-Frame-Options: DENY`, `frame-ancestors 'none'` CSP directive |
-| Privilege escalation | Role enum is monotonic; every privileged action calls `authorize(permission, resource)` which emits an audit event |
+| Privilege escalation via client-supplied role | Role is NEVER trusted from the client — it is derived server-side from `OMCC_ROLE_ADMIN`/`OMCC_ROLE_OPERATOR`/`OMCC_ROLE_VIEWER` env-driven allowlists. Closed-world default: a user not in any tier is denied login. Role enum is monotonic; every privileged action calls `authorize(permission, resource)` which emits an audit event |
+| Open redirect via `next=` after login | The login route and middleware both strip `next` to a same-origin absolute path. Rejects `//evil.com`, `/\evil.com`, `javascript:`, `data:`, and other scheme-bearing or protocol-relative targets |
 | Replay of valid sessions after logout | `session.destroy()` invalidates the encrypted cookie; CSRF token is regenerated on every login |
 | Container compromise → host escape | Helm chart runs as non-root (uid 1001), `readOnlyRootFilesystem`, drops `ALL` capabilities, seccomp `RuntimeDefault` |
 | Network exfiltration from compromised pod | NetworkPolicy template restricts egress to Mirth namespace + DNS only |
@@ -61,7 +62,7 @@ Out of scope (report upstream):
 
 These are intentionally not yet implemented; they are roadmap items.
 
-1. **SSO / OIDC** — current login is a form submission that proxies credentials to Mirth. Phase 2 swaps in OIDC group-claim → role mapping. The form-based login is a deliberate Phase 1 limitation.
+1. **SSO / OIDC** — current login is a form submission that proxies credentials to Mirth and maps usernames to roles via the env-driven `OMCC_ROLE_*` allowlists. Phase 2 swaps in OIDC group-claim → role mapping, removing the env allowlist. The form + env-allowlist approach is a deliberate Phase 1 design — it is real auth (not self-declared), but it does not scale to thousands of users.
 2. **Mutual TLS to Mirth** — only one-way TLS is supported in v0.1. Add when Phase 2 ships outbound mTLS via the undici Agent.
 3. **Audit log persistence** — `audit()` currently emits to the structured logger. Persist to S3/object-lock for HIPAA tamper-evidence (recommended) — out of the box, downstream log retention is the audit trail.
 4. **Rate limiting** — middleware does not enforce per-IP / per-user request quotas. Use ingress-level rate limiting (e.g., `nginx.ingress.kubernetes.io/limit-rps`) until app-level limits ship.

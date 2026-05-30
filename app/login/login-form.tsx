@@ -3,29 +3,62 @@
 import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 
-export function LoginForm({ next }: { next?: string }) {
+interface LoginFormProps {
+  next?: string
+  initialError?: string | null
+}
+
+const ERROR_MESSAGES: Record<string, string> = {
+  invalid_credentials: "Invalid username or password.",
+  no_role: "Your account is not authorized for this console. Contact your administrator.",
+  mirth_unreachable: "Mirth Connect is currently unreachable. Please try again in a moment.",
+}
+
+function safeNextPath(value: string | undefined): string {
+  if (!value) return "/"
+  if (!value.startsWith("/")) return "/"
+  if (value.startsWith("//") || value.startsWith("/\\")) return "/"
+  return value
+}
+
+export function LoginForm({ next, initialError }: LoginFormProps) {
   const router = useRouter()
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [role, setRole] = useState<"viewer" | "operator" | "admin">("operator")
-  const [error, setError] = useState<string | null>(null)
+  const safeNext = safeNextPath(next)
+  const [error, setError] = useState<string | null>(
+    initialError && ERROR_MESSAGES[initialError]
+      ? ERROR_MESSAGES[initialError]
+      : initialError
+        ? "Unable to sign in. Please try again."
+        : null
+  )
   const [submitting, setSubmitting] = useState(false)
 
-  async function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
     setSubmitting(true)
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    const username = String(formData.get("username") ?? "")
+    const password = String(formData.get("password") ?? "")
+
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, role }),
-      })
+      const res = await fetch(
+        `/api/auth/login${safeNext !== "/" ? `?next=${encodeURIComponent(safeNext)}` : ""}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+        }
+      )
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string }
         throw new Error(body.error ?? `Sign-in failed (${res.status})`)
       }
-      router.push(next && next.startsWith("/") ? next : "/")
+      router.push(safeNext)
       router.refresh()
     } catch (err) {
       setError((err as Error).message)
@@ -34,8 +67,18 @@ export function LoginForm({ next }: { next?: string }) {
     }
   }
 
+  // method="post" + action ensures the form works WITHOUT JS too:
+  // the browser submits form-encoded to /api/auth/login which handles
+  // both content types and responds with a redirect.
+  const action =
+    safeNext !== "/"
+      ? `/api/auth/login?next=${encodeURIComponent(safeNext)}`
+      : "/api/auth/login"
+
   return (
     <form
+      method="post"
+      action={action}
       onSubmit={onSubmit}
       className="bg-white rounded-lg border border-ink-200 shadow-sm p-6 space-y-4"
     >
@@ -53,8 +96,7 @@ export function LoginForm({ next }: { next?: string }) {
           name="username"
           autoComplete="username"
           required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          autoFocus
           className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
       </div>
@@ -68,29 +110,8 @@ export function LoginForm({ next }: { next?: string }) {
           type="password"
           autoComplete="current-password"
           required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
-      </div>
-      <div>
-        <label htmlFor="role" className="block text-sm font-medium text-ink-800 mb-1">
-          Role
-        </label>
-        <select
-          id="role"
-          name="role"
-          value={role}
-          onChange={(e) => setRole(e.target.value as typeof role)}
-          className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
-          <option value="viewer">Viewer (read-only)</option>
-          <option value="operator">Operator (start/stop, replay)</option>
-          <option value="admin">Admin (full)</option>
-        </select>
-        <p className="mt-1 text-xs text-ink-600">
-          In production, swap this form for OIDC group-claim mapping (see ARCHITECTURE.md).
-        </p>
       </div>
       <button
         type="submit"
@@ -99,6 +120,12 @@ export function LoginForm({ next }: { next?: string }) {
       >
         {submitting ? "Signing in…" : "Sign in"}
       </button>
+      <p className="text-xs text-ink-600 pt-2 border-t border-ink-100">
+        Your role is assigned by your administrator. Configure role membership
+        on the server via the <code>OMCC_ROLE_ADMIN</code>,{" "}
+        <code>OMCC_ROLE_OPERATOR</code>, and <code>OMCC_ROLE_VIEWER</code> env
+        vars — see the deployment docs.
+      </p>
     </form>
   )
 }

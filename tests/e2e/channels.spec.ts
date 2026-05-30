@@ -8,7 +8,6 @@ async function login(page: import("@playwright/test").Page) {
   await page.goto("/login")
   await page.getByLabel("Username").fill("admin")
   await page.getByLabel("Password").fill("admin")
-  await page.getByLabel("Role").selectOption("operator")
   await page.getByRole("button", { name: /sign in/i }).click()
   await expect(page).toHaveURL("/")
 }

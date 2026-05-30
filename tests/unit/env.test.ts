@@ -33,7 +33,26 @@ describe("getEnv", () => {
       expect(env.MIRTH_USER).toBe("admin")
       expect(env.SESSION_TTL_SECONDS).toBe(8 * 60 * 60)
       expect(env.MIRTH_INSECURE_SKIP_VERIFY).toBe(false)
+      expect(env.OMCC_ROLE_ADMIN).toBe("")
+      expect(env.OMCC_ROLE_OPERATOR).toBe("")
+      expect(env.OMCC_ROLE_VIEWER).toBe("")
     })
+  })
+
+  it("propagates role mapping env vars verbatim", () => {
+    withEnv(
+      {
+        OMCC_ROLE_ADMIN: "alice,bob",
+        OMCC_ROLE_OPERATOR: "*",
+        OMCC_ROLE_VIEWER: "everyone-else",
+      },
+      () => {
+        const env = getEnv()
+        expect(env.OMCC_ROLE_ADMIN).toBe("alice,bob")
+        expect(env.OMCC_ROLE_OPERATOR).toBe("*")
+        expect(env.OMCC_ROLE_VIEWER).toBe("everyone-else")
+      }
+    )
   })
 
   it("rejects a SESSION_PASSWORD shorter than 32 chars", () => {
