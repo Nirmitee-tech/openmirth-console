@@ -70,6 +70,20 @@ export default async function ChannelDetail({
           canMutate={canMutate}
           canDeploy={canDeploy}
         />
+        <div className="mt-4 pt-4 border-t border-ink-100 flex flex-wrap gap-2">
+          <Link
+            href={`/channels/${channel.id}/scripts`}
+            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+          >
+            Edit transformers &amp; filters →
+          </Link>
+          <Link
+            href={`/channels/${channel.id}/messages`}
+            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+          >
+            Browse messages →
+          </Link>
+        </div>
       </section>
 
       <section className="grid grid-cols-2 md:grid-cols-5 gap-4">

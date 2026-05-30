@@ -173,6 +173,34 @@ export class MirthClient {
     await this.post(`/api/channels`, channelXml, "application/xml")
   }
 
+  /** Raw XML for a single channel — used by the script editor. */
+  async getChannelXml(channelId: string): Promise<string> {
+    return await this.text(`/api/channels/${encodeURIComponent(channelId)}`, {
+      accept: "application/xml",
+    })
+  }
+
+  /**
+   * Replace a channel's XML in-place. Used after the script editor
+   * patches transformer/filter blocks. Mirth bumps the revision number
+   * server-side; we redeploy to make changes take effect at runtime.
+   */
+  async updateChannel(channelId: string, channelXml: string): Promise<void> {
+    await this.put(
+      `/api/channels/${encodeURIComponent(channelId)}`,
+      channelXml,
+      "application/xml"
+    )
+  }
+
+  /** Fetch the most recent messages processed by a channel. */
+  async listMessages(channelId: string, limit = 25): Promise<string> {
+    const path =
+      `/api/channels/${encodeURIComponent(channelId)}/messages` +
+      `?limit=${limit}&offset=0&includeContent=true`
+    return await this.text(path, { accept: "application/xml" })
+  }
+
   /**
    * Set the enabled flag on a channel via the channelMetadata map.
    * Required after createChannel() before a _deploy will take effect.

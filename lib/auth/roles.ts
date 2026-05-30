@@ -38,7 +38,7 @@ export const PERMISSIONS = {
   "channel:deploy": "operator",
   "channel:create": "admin",
   "channel:delete": "admin",
-  "channel:update": "admin",
+  "channel:update": "operator",
   // Message operations
   "message:read": "viewer",
   "message:reprocess": "operator",
