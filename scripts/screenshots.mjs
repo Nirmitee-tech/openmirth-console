@@ -59,7 +59,9 @@ if (pickedChannelId) {
 }
 targets.push(
   { path: "/mappings", name: "06-mappings.png" },
-  { path: "/channels/new", name: "07-new-channel.png" }
+  { path: "/channels/new", name: "07-new-channel.png" },
+  { path: "/system/health", name: "08-system-health.png" },
+  { path: "/system/logs", name: "09-system-logs.png" }
 )
 
 for (const t of targets) {
@@ -71,7 +73,7 @@ for (const t of targets) {
   // Pages with a tall code editor look bad in fullPage mode (one huge tall
   // screenshot). Cap them to viewport so the editor + sidebar are visible
   // without scrolling.
-  const isLongPage = t.name.includes("scripts-editor")
+  const isLongPage = t.name.includes("scripts-editor") || t.name.includes("system-logs")
   await page.screenshot({ path: dest, fullPage: !isLongPage })
   console.log(`   saved ${dest}`)
 }

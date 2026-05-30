@@ -3,10 +3,13 @@
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { StateBadge } from "@/components/StateBadge"
+import { RowActionButtons } from "@/components/RowActionButtons"
 import type { ChannelWithStatus } from "@/lib/mirth/schemas"
 
 interface ChannelsTableProps {
   channels: ChannelWithStatus[]
+  csrfToken: string
+  canMutate: boolean
 }
 
 const STATE_OPTIONS = [
@@ -28,7 +31,7 @@ type SortKey =
   | "queued"
 type SortDir = "asc" | "desc"
 
-export function ChannelsTable({ channels }: ChannelsTableProps) {
+export function ChannelsTable({ channels, csrfToken, canMutate }: ChannelsTableProps) {
   const [search, setSearch] = useState("")
   const [stateFilter, setStateFilter] = useState<(typeof STATE_OPTIONS)[number]>("ALL")
   const [sortKey, setSortKey] = useState<SortKey>("queued")
@@ -135,12 +138,13 @@ export function ChannelsTable({ channels }: ChannelsTableProps) {
               <SortableTh label="Sent" k="sent" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
               <SortableTh label="Errors" k="errored" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
               <SortableTh label="Queued" k="queued" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
+              <th className="w-[80px]">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center text-ink-600 py-8">
+                <td colSpan={9} className="text-center text-ink-600 py-8">
                   No channels match the current filters.
                 </td>
               </tr>
@@ -188,6 +192,14 @@ export function ChannelsTable({ channels }: ChannelsTableProps) {
                   }`}
                 >
                   {c.statistics.queued}
+                </td>
+                <td onClick={(e) => e.stopPropagation()}>
+                  <RowActionButtons
+                    channelId={c.id}
+                    state={c.state}
+                    csrfToken={csrfToken}
+                    canMutate={canMutate}
+                  />
                 </td>
               </tr>
             ))}

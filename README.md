@@ -57,6 +57,16 @@ MLLP listener / HTTP listener / Channel Writer templates. Pick one, fill name/po
 
 ![New channel](docs/screenshots/07-new-channel.png)
 
+### System Health (JVM, heap, CPU, disk)
+Live circular gauges for heap%, CPU%, disk%, and allocated memory. Below: server info (Mirth/JVM/OS/DB versions) and raw counters. Refresh re-samples Mirth.
+
+![System Health](docs/screenshots/08-system-health.png)
+
+### Server Logs (Mirth audit log)
+Most-recent events from Mirth's audit log with severity badges, outcome indicators, user/IP attribution, and expandable per-event attributes. Filter by level (ALL / ERROR / WARNING / INFORMATION).
+
+![Server Logs](docs/screenshots/09-system-logs.png)
+
 ## What you get
 
 - **🖥️ Browser admin.** Channel list, channel detail with source → transformer → destinations flow, runtime statistics. No Java client.

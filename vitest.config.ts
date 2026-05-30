@@ -50,6 +50,7 @@ export default defineConfig({
         "lib/mirth/parser.ts",
         "lib/mirth/schemas.ts",
         "lib/mirth/scripts.ts",
+        "lib/mirth/system.ts",
         "lib/mirth/templates.ts",
       ],
       exclude: ["**/*.d.ts"],

@@ -2,6 +2,8 @@ import Link from "next/link"
 import { getMirthClient } from "@/lib/mirth/client"
 import { MirthError } from "@/lib/mirth/errors"
 import { childLogger } from "@/lib/logger"
+import { getSession } from "@/lib/auth/session"
+import { permit } from "@/lib/auth/roles"
 import type { ChannelWithStatus } from "@/lib/mirth/schemas"
 import { ChannelsTable } from "./channels-table"
 
@@ -19,6 +21,11 @@ export default async function ChannelsPage() {
     log.error({ err: (e as Error).message }, "channels list fetch failed")
     error = e instanceof MirthError ? e.message : "Unexpected error loading channels"
   }
+
+  const session = await getSession()
+  const role = session.role ?? "viewer"
+  const csrfToken = session.csrfToken ?? ""
+  const canMutate = permit(role, "channel:start")
 
   return (
     <div className="space-y-6">
@@ -43,7 +50,7 @@ export default async function ChannelsPage() {
         </div>
       ) : null}
 
-      <ChannelsTable channels={channels} />
+      <ChannelsTable channels={channels} csrfToken={csrfToken} canMutate={canMutate} />
     </div>
   )
 }

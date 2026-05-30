@@ -91,6 +91,29 @@ export class MirthClient {
     return parsed.data
   }
 
+  /** JVM + OS info — used by the System Health page. */
+  async systemInfo(): Promise<string> {
+    return await this.text("/api/system/info", { accept: "application/xml" })
+  }
+
+  /** Server-wide statistics aggregated across all channels. */
+  async serverStats(): Promise<string> {
+    return await this.text("/api/system/stats", { accept: "application/xml" })
+  }
+
+  /** Recent server events — used by the Logs page. */
+  async listEvents(limit = 100, offset = 0): Promise<string> {
+    return await this.text(
+      `/api/events?limit=${limit}&offset=${offset}`,
+      { accept: "application/xml" }
+    )
+  }
+
+  /** All configured channel groups (channel groupings the GUI shows). */
+  async listChannelGroups(): Promise<string> {
+    return await this.text("/api/channelgroups", { accept: "application/xml" })
+  }
+
   async listChannels(): Promise<Channel[]> {
     const xml = await this.text("/api/channels", { accept: "application/xml" })
     return parseChannels(xml)

@@ -4,40 +4,40 @@
 
 :root {
   color-scheme: light dark;
-  --background: 246 248 251;
-  --foreground: 11 23 39;
 }
 
-html, body {
-  height: 100%;
-}
+html, body { height: 100%; }
 
 body {
-  background: rgb(var(--background));
-  color: rgb(var(--foreground));
+  @apply bg-ink-50 text-ink-900 dark:bg-ink-900 dark:text-ink-100;
   font-feature-settings: "rlig" 1, "calt" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tight, dense table styles used across the app */
+/* Dense table */
 table.dense th {
-  @apply bg-ink-100 text-left px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-600 border-b border-ink-200;
+  @apply bg-ink-100 dark:bg-ink-800 text-left px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-600 dark:text-ink-400 border-b border-ink-200 dark:border-ink-700;
 }
 table.dense td {
-  @apply px-3 py-2 text-sm text-ink-800 border-b border-ink-100 align-top;
+  @apply px-3 py-2 text-sm text-ink-800 dark:text-ink-200 border-b border-ink-100 dark:border-ink-800 align-top;
 }
 table.dense tbody tr:hover td {
-  @apply bg-ink-50;
+  @apply bg-ink-50 dark:bg-ink-800/60;
 }
 
 /* State badges */
 .badge {
   @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
 }
-.badge-started { @apply bg-emerald-100 text-emerald-800; }
-.badge-stopped { @apply bg-red-100 text-red-800; }
-.badge-paused { @apply bg-amber-100 text-amber-900; }
-.badge-deploying { @apply bg-blue-100 text-blue-800; }
-.badge-undeploying { @apply bg-orange-100 text-orange-800; }
-.badge-unknown { @apply bg-ink-100 text-ink-600; }
+.badge-started     { @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200; }
+.badge-stopped     { @apply bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200; }
+.badge-paused      { @apply bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200; }
+.badge-deploying   { @apply bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200; }
+.badge-undeploying { @apply bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200; }
+.badge-unknown     { @apply bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400; }
+
+/* Card surface — common pattern across the app */
+.card {
+  @apply bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded-lg;
+}
