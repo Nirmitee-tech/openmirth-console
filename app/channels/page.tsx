@@ -31,8 +31,8 @@ export default async function ChannelsPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Channels</h1>
-          <p className="text-sm text-ink-600 mt-1">
+          <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">Channels</h1>
+          <p className="text-sm text-ink-600 dark:text-ink-400 mt-1">
             Search, filter, sort. Export to CSV for offline review.
           </p>
         </div>

@@ -129,15 +129,15 @@ export function ScriptsEditor({ channelId, scripts: initial, canEdit, csrfToken 
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-ink-200 p-3 flex flex-wrap items-center gap-3">
+      <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-3 flex flex-wrap items-center gap-3">
         {canEdit ? (
           <>
-            <label className="flex items-center gap-2 text-sm text-ink-700">
+            <label className="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-300">
               <input
                 type="checkbox"
                 checked={redeploy}
                 onChange={(e) => setRedeploy(e.target.checked)}
-                className="rounded border-ink-300"
+                className="rounded border-ink-300 dark:border-ink-700"
               />
               Redeploy after save
             </label>
@@ -151,7 +151,7 @@ export function ScriptsEditor({ channelId, scripts: initial, canEdit, csrfToken 
             </button>
           </>
         ) : (
-          <span className="text-xs text-ink-600">
+          <span className="text-xs text-ink-600 dark:text-ink-400">
             Read-only — operator role required to edit transformers and filters.
           </span>
         )}
@@ -170,7 +170,7 @@ export function ScriptsEditor({ channelId, scripts: initial, canEdit, csrfToken 
 
       <div className="grid lg:grid-cols-[260px_1fr] gap-4">
         {/* Sidebar — navigation across every script slot in the channel */}
-        <aside className="bg-white rounded-lg border border-ink-200 p-3 space-y-4 self-start">
+        <aside className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-3 space-y-4 self-start">
           <Group label="Source connector">
             <TabBtn current={tab} self={{ kind: "source-transformer" }} setTab={setTab}>
               Transformer ({scripts.source.transformerSteps.length})
@@ -295,7 +295,7 @@ export function ScriptsEditor({ channelId, scripts: initial, canEdit, csrfToken 
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-wide text-ink-600 mb-1">{label}</div>
+      <div className="text-xs uppercase tracking-wide text-ink-600 dark:text-ink-400 mb-1">{label}</div>
       <div className="space-y-0.5">{children}</div>
     </div>
   )
@@ -340,8 +340,8 @@ function ChannelLevelEditor({
   const meta = CHANNEL_LEVEL_LABELS[kind]
   return (
     <section>
-      <h2 className="text-lg font-semibold text-ink-900">{meta.label}</h2>
-      <p className="text-sm text-ink-600 mb-3">{meta.sub}</p>
+      <h2 className="text-lg font-semibold text-ink-900 dark:text-ink-100">{meta.label}</h2>
+      <p className="text-sm text-ink-600 dark:text-ink-400 mb-3">{meta.sub}</p>
       <CodeEditor
         value={value}
         onChange={onChange}
@@ -396,27 +396,27 @@ function StepListEditor({
     <section>
       <div className="flex flex-wrap items-end justify-between gap-3 mb-2">
         <div>
-          <h2 className="text-lg font-semibold text-ink-900">{kindLabel}</h2>
-          <p className="text-sm text-ink-600 max-w-3xl">{kindBlurb}</p>
+          <h2 className="text-lg font-semibold text-ink-900 dark:text-ink-100">{kindLabel}</h2>
+          <p className="text-sm text-ink-600 dark:text-ink-400 max-w-3xl">{kindBlurb}</p>
         </div>
         {!readOnly ? (
           <button
             type="button"
             onClick={add}
-            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:bg-ink-50 dark:hover:bg-ink-700 text-ink-900 dark:text-ink-100"
           >
             + Add step
           </button>
         ) : null}
       </div>
       {steps.length === 0 ? (
-        <div className="rounded border border-dashed border-ink-200 bg-white p-8 text-center text-sm text-ink-600">
+        <div className="rounded border border-dashed border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 p-8 text-center text-sm text-ink-600 dark:text-ink-400">
           No steps yet. {readOnly ? "" : "Click “Add step” to create one."}
         </div>
       ) : (
         <div className="space-y-3">
           {steps.map((s, idx) => (
-            <div key={idx} className="bg-white rounded-lg border border-ink-200 p-3 space-y-2">
+            <div key={idx} className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-3 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
@@ -424,9 +424,9 @@ function StepListEditor({
                   onChange={(e) => update(idx, { name: e.target.value })}
                   placeholder={`Step ${idx + 1}`}
                   readOnly={readOnly}
-                  className={`flex-1 min-w-[240px] rounded border border-ink-200 px-2 py-1 text-sm ${readOnly ? "bg-ink-50" : "bg-white"} focus:outline-none focus:ring-1 focus:ring-brand-500`}
+                  className={`flex-1 min-w-[240px] rounded border border-ink-200 dark:border-ink-700 px-2 py-1 text-sm ${readOnly ? "bg-ink-50" : "bg-white"} focus:outline-none focus:ring-1 focus:ring-brand-500`}
                 />
-                <label className="flex items-center gap-1 text-xs text-ink-700">
+                <label className="flex items-center gap-1 text-xs text-ink-700 dark:text-ink-300">
                   <input
                     type="checkbox"
                     checked={s.enabled}
@@ -441,7 +441,7 @@ function StepListEditor({
                       type="button"
                       onClick={() => move(idx, -1)}
                       disabled={idx === 0}
-                      className="text-xs text-ink-600 hover:text-ink-900 disabled:opacity-30"
+                      className="text-xs text-ink-600 dark:text-ink-400 hover:text-ink-900 dark:hover:text-ink-100 disabled:opacity-30"
                       title="Move up"
                     >
                       ↑
@@ -450,7 +450,7 @@ function StepListEditor({
                       type="button"
                       onClick={() => move(idx, 1)}
                       disabled={idx === steps.length - 1}
-                      className="text-xs text-ink-600 hover:text-ink-900 disabled:opacity-30"
+                      className="text-xs text-ink-600 dark:text-ink-400 hover:text-ink-900 dark:hover:text-ink-100 disabled:opacity-30"
                       title="Move down"
                     >
                       ↓

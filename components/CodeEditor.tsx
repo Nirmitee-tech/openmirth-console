@@ -33,7 +33,7 @@ export function CodeEditor({
     [language]
   )
   return (
-    <div className="rounded border border-ink-200 overflow-hidden">
+    <div className="rounded border border-ink-200 dark:border-ink-700 overflow-hidden">
       <CodeMirror
         value={value}
         onChange={onChange}

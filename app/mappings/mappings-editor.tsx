@@ -141,11 +141,11 @@ export function MappingsEditor({ initial, canEdit, csrfToken }: MappingsEditorPr
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter by key or value..."
-          className="rounded border border-ink-200 px-3 py-1.5 text-sm flex-1 min-w-[220px] focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded border border-ink-200 dark:border-ink-700 px-3 py-1.5 text-sm flex-1 min-w-[220px] focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <a
           href="/api/mappings/export.csv"
-          className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+          className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:bg-ink-50 dark:hover:bg-ink-700 text-ink-900 dark:text-ink-100"
         >
           Export CSV
         </a>
@@ -154,7 +154,7 @@ export function MappingsEditor({ initial, canEdit, csrfToken }: MappingsEditorPr
             <button
               type="button"
               onClick={add}
-              className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+              className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:bg-ink-50 dark:hover:bg-ink-700 text-ink-900 dark:text-ink-100"
             >
               + Add mapping
             </button>
@@ -168,7 +168,7 @@ export function MappingsEditor({ initial, canEdit, csrfToken }: MappingsEditorPr
             </button>
           </>
         ) : (
-          <span className="text-xs text-ink-600">
+          <span className="text-xs text-ink-600 dark:text-ink-400">
             Read-only — admin role required to edit.
           </span>
         )}
@@ -185,7 +185,7 @@ export function MappingsEditor({ initial, canEdit, csrfToken }: MappingsEditorPr
         </div>
       ) : null}
 
-      <div className="bg-white rounded-lg border border-ink-200 overflow-hidden">
+      <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 overflow-hidden">
         <table className="dense w-full">
           <thead>
             <tr>
@@ -198,7 +198,7 @@ export function MappingsEditor({ initial, canEdit, csrfToken }: MappingsEditorPr
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={canEdit ? 4 : 3} className="text-center text-ink-600 py-8">
+                <td colSpan={canEdit ? 4 : 3} className="text-center text-ink-600 dark:text-ink-400 py-8">
                   No mappings found.
                 </td>
               </tr>
@@ -231,10 +231,10 @@ export function MappingsEditor({ initial, canEdit, csrfToken }: MappingsEditorPr
                       value={row.value}
                       onChange={(e) => update(idx, { value: e.target.value })}
                       readOnly={!canEdit}
-                      className={`w-full font-mono text-xs px-2 py-1 rounded border border-ink-200 ${!canEdit ? "bg-ink-50" : "bg-white"} focus:outline-none focus:ring-1 focus:ring-brand-500`}
+                      className={`w-full font-mono text-xs px-2 py-1 rounded border border-ink-200 dark:border-ink-700 ${!canEdit ? "bg-ink-50" : "bg-white"} focus:outline-none focus:ring-1 focus:ring-brand-500`}
                     />
                   </td>
-                  <td className="text-xs uppercase tracking-wide text-ink-600">{row.status}</td>
+                  <td className="text-xs uppercase tracking-wide text-ink-600 dark:text-ink-400">{row.status}</td>
                   {canEdit ? (
                     <td>
                       <button

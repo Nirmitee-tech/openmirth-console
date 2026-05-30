@@ -54,8 +54,8 @@ export default async function ChannelMessagesPage({
         >
           ← {channelName || "Channel"}
         </Link>
-        <h1 className="text-2xl font-semibold text-ink-900">Messages</h1>
-        <p className="text-sm text-ink-600 max-w-3xl">
+        <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">Messages</h1>
+        <p className="text-sm text-ink-600 dark:text-ink-400 max-w-3xl">
           Recent messages processed by this channel. Click a row to expand and inspect
           the raw, transformed, encoded, and response payloads per connector.
         </p>

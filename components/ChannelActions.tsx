@@ -84,7 +84,7 @@ export function ChannelActions({ channelId, state, csrfToken, canMutate, canDepl
 
   if (actions.length === 0) {
     return (
-      <div className="text-sm text-ink-600 italic">
+      <div className="text-sm text-ink-600 dark:text-ink-400 italic">
         Channel is transitioning ({state}); actions paused.
       </div>
     )

@@ -122,7 +122,7 @@ function Pair({ label, value }: { label: string; value: string }) {
       <dt className="text-ink-600 dark:text-ink-400 w-[140px] text-xs uppercase tracking-wide">
         {label}
       </dt>
-      <dd className="text-ink-800 dark:text-ink-100 font-mono text-sm break-all">{value}</dd>
+      <dd className="text-ink-800 dark:text-ink-200 dark:text-ink-100 font-mono text-sm break-all">{value}</dd>
     </div>
   )
 }

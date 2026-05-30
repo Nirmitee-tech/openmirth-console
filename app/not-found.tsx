@@ -4,8 +4,8 @@ export default function NotFound() {
   return (
     <div className="max-w-md mx-auto mt-16 text-center">
       <p className="text-sm font-semibold text-brand-500">404</p>
-      <h1 className="text-2xl font-semibold text-ink-900 mt-2">Page not found</h1>
-      <p className="text-sm text-ink-600 mt-2">
+      <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100 mt-2">Page not found</h1>
+      <p className="text-sm text-ink-600 dark:text-ink-400 mt-2">
         The page or channel you&apos;re looking for doesn&apos;t exist.
       </p>
       <Link

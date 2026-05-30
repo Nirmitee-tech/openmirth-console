@@ -122,7 +122,7 @@ export default async function SystemLogsPage({
                       <dl className="mt-1 grid grid-cols-[max-content_1fr] gap-x-3 gap-y-0.5">
                         {Object.entries(e.attributes).map(([k, v]) => (
                           <div key={k} className="contents">
-                            <dt className="text-ink-500">{k}</dt>
+                            <dt className="text-ink-500 dark:text-ink-500">{k}</dt>
                             <dd className="font-mono break-all">{v}</dd>
                           </div>
                         ))}

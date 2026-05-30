@@ -17,6 +17,8 @@ const USERNAME = process.env.SCREENSHOTS_USER ?? "admin"
 const PASSWORD = process.env.SCREENSHOTS_PASS ?? "admin"
 // CHANNEL_ID can be passed via env; otherwise we'll pick the first one.
 const CHANNEL_ID = process.env.SCREENSHOTS_CHANNEL_ID ?? ""
+// THEME = "light" | "dark"
+const THEME = process.env.SCREENSHOTS_THEME ?? "light"
 
 await mkdir(OUT_DIR, { recursive: true })
 
@@ -25,6 +27,10 @@ const context = await browser.newContext({
   viewport: { width: 1440, height: 900 },
   deviceScaleFactor: 2,
 })
+// Pre-seed the theme preference so the first paint already matches.
+await context.addInitScript((theme) => {
+  try { localStorage.setItem("omcc-theme", theme) } catch (e) {}
+}, THEME === "dark" ? "dark" : "light")
 const page = await context.newPage()
 
 console.log(`→ ${BASE_URL}/login`)

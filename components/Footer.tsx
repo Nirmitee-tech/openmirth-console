@@ -9,11 +9,11 @@ import Link from "next/link"
  */
 export function Footer() {
   return (
-    <footer className="border-t border-ink-200 bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-ink-600">
+    <footer className="border-t border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800">
+      <div className="mx-auto max-w-7xl px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-ink-600 dark:text-ink-400">
         <div>
           <span>OpenMirth Console</span>
-          <span className="mx-2 text-ink-400">·</span>
+          <span className="mx-2 text-ink-400 dark:text-ink-500">·</span>
           <Link
             href="https://github.com/Nirmitee-tech/openmirth-console"
             target="_blank"
@@ -22,7 +22,7 @@ export function Footer() {
           >
             GitHub
           </Link>
-          <span className="mx-2 text-ink-400">·</span>
+          <span className="mx-2 text-ink-400 dark:text-ink-500">·</span>
           <Link href="/about" className="hover:text-brand-500">
             About
           </Link>
@@ -43,7 +43,7 @@ export function Footer() {
             href="https://nirmitee.io/get-in-touch?utm_source=openmirth-console&utm_medium=footer-support"
             target="_blank"
             rel="noreferrer noopener"
-            className="text-ink-600 hover:text-brand-500 underline-offset-4 hover:underline"
+            className="text-ink-600 dark:text-ink-400 hover:text-brand-500 underline-offset-4 hover:underline"
           >
             Need Mirth Connect support?
           </Link>

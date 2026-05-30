@@ -27,8 +27,8 @@ export default async function MappingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold text-ink-900">Mappings</h1>
-        <p className="text-sm text-ink-600 mt-1 max-w-3xl">
+        <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">Mappings</h1>
+        <p className="text-sm text-ink-600 dark:text-ink-400 mt-1 max-w-3xl">
           The Configuration Map is Mirth&apos;s server-level key/value store. Channels
           reference values via <code>configurationMap.get(&apos;FACILITY_NPI&apos;)</code> —
           use it for environment-specific endpoints, terminology mappings,
@@ -44,13 +44,13 @@ export default async function MappingsPage() {
 
       <MappingsEditor initial={entries} canEdit={canEdit} csrfToken={csrfToken} />
 
-      <details className="bg-white rounded border border-ink-200 p-4 text-sm text-ink-700">
-        <summary className="cursor-pointer font-medium text-ink-900">
+      <details className="bg-white dark:bg-ink-800 rounded border border-ink-200 dark:border-ink-700 p-4 text-sm text-ink-700 dark:text-ink-300">
+        <summary className="cursor-pointer font-medium text-ink-900 dark:text-ink-100">
           How channels reference these values
         </summary>
         <div className="mt-3 space-y-3">
           <p>From any transformer or source/destination script:</p>
-          <pre className="bg-ink-50 p-3 rounded text-xs font-mono overflow-x-auto">
+          <pre className="bg-ink-50 dark:bg-ink-800 p-3 rounded text-xs font-mono overflow-x-auto">
 {`// Read a single value
 var npi = configurationMap.get('FACILITY_NPI');
 

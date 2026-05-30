@@ -52,18 +52,18 @@ export function MessageBrowser({ messages, channelId, currentLimit }: MessageBro
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-ink-200 p-3 flex flex-wrap items-center gap-3">
+      <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-3 flex flex-wrap items-center gap-3">
         <input
           type="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search message id, connector name, or content..."
-          className="rounded border border-ink-200 px-3 py-1.5 text-sm flex-1 min-w-[280px] focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded border border-ink-200 dark:border-ink-700 px-3 py-1.5 text-sm flex-1 min-w-[280px] focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "ALL" | ConnectorStatus)}
-          className="rounded border border-ink-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded border border-ink-200 dark:border-ink-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="ALL">All statuses</option>
           {(Object.keys(STATUS_BADGES) as ConnectorStatus[]).map((s) => (
@@ -73,7 +73,7 @@ export function MessageBrowser({ messages, channelId, currentLimit }: MessageBro
         <select
           value={currentLimit}
           onChange={(e) => router.push(`/channels/${channelId}/messages?limit=${e.target.value}`)}
-          className="rounded border border-ink-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded border border-ink-200 dark:border-ink-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           title="Most-recent N messages to load"
         >
           {[10, 25, 50, 100, 200].map((n) => (
@@ -83,17 +83,17 @@ export function MessageBrowser({ messages, channelId, currentLimit }: MessageBro
         <button
           type="button"
           onClick={() => router.refresh()}
-          className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+          className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:bg-ink-50 dark:hover:bg-ink-700 text-ink-900 dark:text-ink-100"
         >
           Refresh
         </button>
-        <span className="ml-auto text-sm text-ink-600">
+        <span className="ml-auto text-sm text-ink-600 dark:text-ink-400">
           {filtered.length} of {messages.length}
         </span>
       </div>
 
       {messages.length === 0 ? (
-        <div className="bg-white rounded-lg border border-ink-200 p-8 text-center text-sm text-ink-600">
+        <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-8 text-center text-sm text-ink-600 dark:text-ink-400">
           No messages have been processed by this channel yet.
         </div>
       ) : null}
@@ -103,28 +103,28 @@ export function MessageBrowser({ messages, channelId, currentLimit }: MessageBro
           const isOpen = expanded === m.messageId
           const overallStatus = pickOverallStatus(m.connectors)
           return (
-            <article key={m.messageId} className="bg-white rounded-lg border border-ink-200 overflow-hidden">
+            <article key={m.messageId} className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 overflow-hidden">
               <button
                 type="button"
                 onClick={() => setExpanded(isOpen ? null : m.messageId)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-ink-50"
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-ink-50 dark:hover:bg-ink-700"
               >
-                <span className="text-xs font-mono text-ink-600 w-16">
+                <span className="text-xs font-mono text-ink-600 dark:text-ink-400 w-16">
                   #{m.messageId}
                 </span>
                 <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_BADGES[overallStatus]}`}>
                   {overallStatus}
                 </span>
-                <span className="text-xs text-ink-600">{formatTime(m.receivedAt)}</span>
-                <span className="text-xs text-ink-600">
+                <span className="text-xs text-ink-600 dark:text-ink-400">{formatTime(m.receivedAt)}</span>
+                <span className="text-xs text-ink-600 dark:text-ink-400">
                   {m.connectors.length} connector{m.connectors.length === 1 ? "" : "s"}
                 </span>
-                <span className="ml-auto text-ink-400 text-xs">
+                <span className="ml-auto text-ink-400 dark:text-ink-500 text-xs">
                   {isOpen ? "▲" : "▼"}
                 </span>
               </button>
               {isOpen ? (
-                <div className="border-t border-ink-200 divide-y divide-ink-100">
+                <div className="border-t border-ink-200 dark:border-ink-700 divide-y divide-ink-100 dark:divide-ink-800">
                   {m.connectors.map((c) => (
                     <ConnectorView key={c.metaDataId} connector={c} />
                   ))}
@@ -161,10 +161,10 @@ function ConnectorView({ connector }: { connector: ConnectorPayload }) {
   return (
     <div className="px-4 py-3 space-y-2">
       <div className="flex items-center gap-3">
-        <span className="text-xs text-ink-600">
+        <span className="text-xs text-ink-600 dark:text-ink-400">
           {connector.metaDataId === 0 ? "Source" : `Destination ${connector.metaDataId}`}
         </span>
-        <span className="text-sm font-medium text-ink-900">{connector.connectorName || "—"}</span>
+        <span className="text-sm font-medium text-ink-900 dark:text-ink-100">{connector.connectorName || "—"}</span>
         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_BADGES[connector.status]}`}>
           {connector.status}
         </span>
@@ -173,7 +173,7 @@ function ConnectorView({ connector }: { connector: ConnectorPayload }) {
         ) : null}
       </div>
       {available.length === 0 ? (
-        <div className="text-xs text-ink-600 italic">No payload content recorded.</div>
+        <div className="text-xs text-ink-600 dark:text-ink-400 italic">No payload content recorded.</div>
       ) : (
         <>
           <div className="flex gap-1">

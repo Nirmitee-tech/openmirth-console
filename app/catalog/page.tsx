@@ -5,8 +5,8 @@ export default function CatalogPage() {
   if (!env.CATALOG_URL) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold text-ink-900">Interface Catalog</h1>
-        <div className="rounded border border-ink-200 bg-white p-6 text-sm text-ink-600">
+        <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">Interface Catalog</h1>
+        <div className="rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 p-6 text-sm text-ink-600 dark:text-ink-400">
           The interface catalog isn&apos;t configured. Set <code>CATALOG_URL</code> in your env
           to the published location of the{" "}
           <a

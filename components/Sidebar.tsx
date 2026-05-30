@@ -64,7 +64,7 @@ export function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
 
   return (
     <nav
-      className={`bg-white dark:bg-ink-900 border-r border-ink-200 dark:border-ink-800 flex-shrink-0 ${
+      className={`bg-white dark:bg-ink-800 dark:bg-ink-900 border-r border-ink-200 dark:border-ink-700 dark:border-ink-800 flex-shrink-0 ${
         collapsed ? "w-14" : "w-60"
       } transition-all duration-150 overflow-y-auto`}
       aria-label="Primary navigation"

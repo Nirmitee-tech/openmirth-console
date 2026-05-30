@@ -80,7 +80,7 @@ export function LoginForm({ next, initialError }: LoginFormProps) {
       method="post"
       action={action}
       onSubmit={onSubmit}
-      className="bg-white rounded-lg border border-ink-200 shadow-sm p-6 space-y-4"
+      className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 shadow-sm p-6 space-y-4"
     >
       {error ? (
         <div className="rounded border border-red-200 bg-red-50 text-red-800 text-sm px-3 py-2">
@@ -88,7 +88,7 @@ export function LoginForm({ next, initialError }: LoginFormProps) {
         </div>
       ) : null}
       <div>
-        <label htmlFor="username" className="block text-sm font-medium text-ink-800 mb-1">
+        <label htmlFor="username" className="block text-sm font-medium text-ink-800 dark:text-ink-200 mb-1">
           Username
         </label>
         <input
@@ -97,11 +97,11 @@ export function LoginForm({ next, initialError }: LoginFormProps) {
           autoComplete="username"
           required
           autoFocus
-          className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full rounded border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-ink-800 mb-1">
+        <label htmlFor="password" className="block text-sm font-medium text-ink-800 dark:text-ink-200 mb-1">
           Password
         </label>
         <input
@@ -110,7 +110,7 @@ export function LoginForm({ next, initialError }: LoginFormProps) {
           type="password"
           autoComplete="current-password"
           required
-          className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full rounded border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
       </div>
       <button
@@ -120,7 +120,7 @@ export function LoginForm({ next, initialError }: LoginFormProps) {
       >
         {submitting ? "Signing in…" : "Sign in"}
       </button>
-      <p className="text-xs text-ink-600 pt-2 border-t border-ink-100">
+      <p className="text-xs text-ink-600 dark:text-ink-400 pt-2 border-t border-ink-100 dark:border-ink-800">
         Your role is assigned by your administrator. Configure role membership
         on the server via the <code>OMCC_ROLE_ADMIN</code>,{" "}
         <code>OMCC_ROLE_OPERATOR</code>, and <code>OMCC_ROLE_VIEWER</code> env

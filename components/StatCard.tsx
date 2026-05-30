@@ -14,12 +14,12 @@ const toneClass: Record<NonNullable<StatCardProps["tone"]>, string> = {
 
 export function StatCard({ label, value, sub, tone = "neutral" }: StatCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-ink-200 p-5">
-      <div className="text-xs uppercase tracking-wide text-ink-600">{label}</div>
+    <div className="bg-white dark:bg-ink-800 rounded-lg shadow-sm border border-ink-200 dark:border-ink-700 p-5">
+      <div className="text-xs uppercase tracking-wide text-ink-600 dark:text-ink-400">{label}</div>
       <div className={`mt-1 text-3xl font-semibold tabular-nums ${toneClass[tone]}`}>
         {value}
       </div>
-      {sub ? <div className="mt-1 text-xs text-ink-600">{sub}</div> : null}
+      {sub ? <div className="mt-1 text-xs text-ink-600 dark:text-ink-400">{sub}</div> : null}
     </div>
   )
 }

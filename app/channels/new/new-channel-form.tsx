@@ -78,7 +78,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <section>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-600 mb-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-600 dark:text-ink-400 mb-3">
           1. Pick a template
         </h2>
         <div className="grid md:grid-cols-3 gap-3">
@@ -95,11 +95,11 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
                     : "border-ink-200 bg-white hover:border-brand-500/50"
                 }`}
               >
-                <div className="font-semibold text-ink-900">{t.title}</div>
-                <div className="mt-1 text-xs text-ink-600">{t.subtitle}</div>
+                <div className="font-semibold text-ink-900 dark:text-ink-100">{t.title}</div>
+                <div className="mt-1 text-xs text-ink-600 dark:text-ink-400">{t.subtitle}</div>
                 <div className="mt-2 text-xs">
-                  <span className="text-ink-600">Best for: </span>
-                  <span className="text-ink-800">{t.bestFor}</span>
+                  <span className="text-ink-600 dark:text-ink-400">Best for: </span>
+                  <span className="text-ink-800 dark:text-ink-200">{t.bestFor}</span>
                 </div>
               </button>
             )
@@ -107,8 +107,8 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
         </div>
       </section>
 
-      <section className="bg-white rounded-lg border border-ink-200 p-6 space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-600">
+      <section className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-6 space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-600 dark:text-ink-400">
           2. Configure
         </h2>
 
@@ -118,7 +118,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
             onChange={(e) => setName(e.target.value)}
             required
             placeholder="e.g. Lab Results (ORU) Listener"
-            className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </Field>
 
@@ -128,7 +128,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="Short description shown in the channel list."
-            className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </Field>
 
@@ -142,7 +142,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
               onChange={(e) => setPort(e.target.value === "" ? "" : Number(e.target.value))}
               required
               placeholder={picked === "mllp-passthrough" ? "6661" : "8081"}
-              className="w-32 rounded border border-ink-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-32 rounded border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </Field>
         ) : null}
@@ -154,7 +154,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
               onChange={(e) => setContextPath(e.target.value)}
               required
               placeholder="/inbound"
-              className="w-64 rounded border border-ink-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-64 rounded border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </Field>
         ) : null}
@@ -164,7 +164,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
             <select
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              className="w-full rounded border border-ink-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">— Don&apos;t dispatch (drop after receive) —</option>
               {existingChannels.map((c) => (
@@ -173,7 +173,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
                 </option>
               ))}
             </select>
-            <p className="text-xs text-ink-600 mt-1">
+            <p className="text-xs text-ink-600 dark:text-ink-400 mt-1">
               Adds a Channel Writer destination pointing at the selected target channel.
             </p>
           </Field>
@@ -194,7 +194,7 @@ export function NewChannelForm({ templates, csrfToken, existingChannels }: NewCh
         >
           {submitting ? "Creating…" : "Create + Deploy"}
         </button>
-        <span className="text-xs text-ink-600">
+        <span className="text-xs text-ink-600 dark:text-ink-400">
           The channel will be imported, enabled, and deployed in one shot.
         </span>
       </div>
@@ -213,7 +213,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-sm font-medium text-ink-800 mb-1">
+      <span className="block text-sm font-medium text-ink-800 dark:text-ink-200 mb-1">
         {label}
         {required ? <span className="text-red-600 ml-0.5">*</span> : null}
       </span>

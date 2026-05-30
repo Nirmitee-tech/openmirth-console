@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         {showShell ? (
-          <div className="min-h-screen flex flex-col bg-ink-50 dark:bg-ink-900">
+          <div className="min-h-screen flex flex-col bg-ink-50 dark:bg-ink-800 dark:bg-ink-900">
             <Header username={session.username} role={session.role} />
             <div className="flex flex-1 min-h-0">
               <Sidebar />
@@ -55,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Footer />
           </div>
         ) : (
-          <div className="min-h-screen flex flex-col bg-ink-50 dark:bg-ink-900">
+          <div className="min-h-screen flex flex-col bg-ink-50 dark:bg-ink-800 dark:bg-ink-900">
             <Header />
             <main className="flex-1 px-6 py-6 max-w-7xl mx-auto w-full">{children}</main>
             <Footer />

@@ -83,7 +83,7 @@ export function RowActionButtons({ channelId, state, csrfToken, canMutate }: Row
             e.stopPropagation()
             void run(a)
           }}
-          className={`w-6 h-6 flex items-center justify-center rounded text-xs leading-none ${COLOR[a]} disabled:opacity-30 hover:bg-ink-100 dark:hover:bg-ink-800`}
+          className={`w-6 h-6 flex items-center justify-center rounded text-xs leading-none ${COLOR[a]} disabled:opacity-30 hover:bg-ink-100 dark:hover:bg-ink-700 dark:hover:bg-ink-800`}
         >
           {busy === a ? "…" : ICON[a]}
         </button>

@@ -85,18 +85,18 @@ export function ChannelsTable({ channels, csrfToken, canMutate }: ChannelsTableP
 
   return (
     <div className="space-y-3">
-      <div className="bg-white rounded-lg border border-ink-200 p-3 flex flex-wrap items-center gap-3">
+      <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-3 flex flex-wrap items-center gap-3">
         <input
           type="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, ID, description, or destination..."
-          className="rounded border border-ink-200 px-3 py-1.5 text-sm flex-1 min-w-[240px] focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded border border-ink-200 dark:border-ink-700 px-3 py-1.5 text-sm flex-1 min-w-[240px] focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <select
           value={stateFilter}
           onChange={(e) => setStateFilter(e.target.value as (typeof STATE_OPTIONS)[number])}
-          className="rounded border border-ink-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded border border-ink-200 dark:border-ink-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           {STATE_OPTIONS.map((s) => (
             <option key={s} value={s}>
@@ -107,7 +107,7 @@ export function ChannelsTable({ channels, csrfToken, canMutate }: ChannelsTableP
         <select
           value={sourceFilter}
           onChange={(e) => setSourceFilter(e.target.value)}
-          className="rounded border border-ink-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded border border-ink-200 dark:border-ink-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           {sourceOptions.map((s) => (
             <option key={s} value={s}>
@@ -115,18 +115,18 @@ export function ChannelsTable({ channels, csrfToken, canMutate }: ChannelsTableP
             </option>
           ))}
         </select>
-        <span className="ml-auto text-sm text-ink-600">
+        <span className="ml-auto text-sm text-ink-600 dark:text-ink-400">
           {sorted.length} of {channels.length}
         </span>
         <a
           href="/api/channels/export.csv"
-          className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+          className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:bg-ink-50 dark:hover:bg-ink-700 text-ink-900 dark:text-ink-100"
         >
           Export CSV
         </a>
       </div>
 
-      <div className="bg-white rounded-lg border border-ink-200 overflow-hidden">
+      <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 overflow-hidden">
         <table className="dense w-full">
           <thead>
             <tr>
@@ -144,7 +144,7 @@ export function ChannelsTable({ channels, csrfToken, canMutate }: ChannelsTableP
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={9} className="text-center text-ink-600 py-8">
+                <td colSpan={9} className="text-center text-ink-600 dark:text-ink-400 py-8">
                   No channels match the current filters.
                 </td>
               </tr>
@@ -159,7 +159,7 @@ export function ChannelsTable({ channels, csrfToken, canMutate }: ChannelsTableP
                     {c.name}
                   </Link>
                   {c.description ? (
-                    <div className="text-xs text-ink-600 mt-0.5 line-clamp-1">
+                    <div className="text-xs text-ink-600 dark:text-ink-400 mt-0.5 line-clamp-1">
                       {c.description}
                     </div>
                   ) : null}

@@ -27,8 +27,8 @@ export default async function NewChannelPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold text-ink-900">New channel</h1>
-        <p className="text-sm text-ink-600 mt-1 max-w-3xl">
+        <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">New channel</h1>
+        <p className="text-sm text-ink-600 dark:text-ink-400 mt-1 max-w-3xl">
           Create a channel from a hand-tuned template. The console builds a known-good
           Mirth XML body, imports via the REST API, enables it, and deploys.
         </p>

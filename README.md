@@ -67,6 +67,13 @@ Most-recent events from Mirth's audit log with severity badges, outcome indicato
 
 ![Server Logs](docs/screenshots/09-system-logs.png)
 
+### Dark mode
+Toggle from the top bar; preference persists per browser. All cards, tables, sidebars, and forms re-themed. Pre-paint script avoids the white flash.
+
+![Dashboard, dark mode](docs/screenshots/dark/01-dashboard.png)
+![Channel detail, dark mode](docs/screenshots/dark/03-channel-detail.png)
+![System Health, dark mode](docs/screenshots/dark/08-system-health.png)
+
 ## What you get
 
 - **🖥️ Browser admin.** Channel list, channel detail with source → transformer → destinations flow, runtime statistics. No Java client.

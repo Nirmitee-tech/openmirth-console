@@ -54,8 +54,8 @@ export default async function ChannelScriptsPage({
         >
           ← {channelName || "Channel"}
         </Link>
-        <h1 className="text-2xl font-semibold text-ink-900">Transformers & Filters</h1>
-        <p className="text-sm text-ink-600 max-w-3xl">
+        <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">Transformers & Filters</h1>
+        <p className="text-sm text-ink-600 dark:text-ink-400 max-w-3xl">
           The actual logic of the channel — JavaScript transformers turn raw inbound
           messages into typed outbound payloads; filters accept or reject messages
           before they hit destinations. Channel-level scripts run on deploy and

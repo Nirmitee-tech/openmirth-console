@@ -100,8 +100,8 @@ export default async function Dashboard() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Dashboard</h1>
-          <p className="text-sm text-ink-600 mt-1">
+          <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">Dashboard</h1>
+          <p className="text-sm text-ink-600 dark:text-ink-400 mt-1">
             Live operational view of Mirth Connect{version ? ` ${version}` : ""} — grouped by
             clinical interface type so you can see workflow impact at a glance.
           </p>
@@ -109,7 +109,7 @@ export default async function Dashboard() {
         <div className="flex flex-wrap gap-2">
           <Link
             href="/channels"
-            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:bg-ink-50 dark:hover:bg-ink-700 text-ink-900 dark:text-ink-100"
           >
             All channels →
           </Link>
@@ -155,9 +155,9 @@ export default async function Dashboard() {
 
       {/* Clinical interface rollups — the most CIO-friendly view */}
       <section>
-        <h2 className="text-lg font-semibold text-ink-900 mb-3">By clinical interface</h2>
+        <h2 className="text-lg font-semibold text-ink-900 dark:text-ink-100 mb-3">By clinical interface</h2>
         {orderedBuckets.length === 0 && !error ? (
-          <div className="bg-white rounded-lg border border-ink-200 p-6 text-sm text-ink-600">
+          <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-6 text-sm text-ink-600 dark:text-ink-400">
             No channels classified yet.
           </div>
         ) : (
@@ -175,7 +175,7 @@ export default async function Dashboard() {
           empty="No channels are reporting errors. 🎉"
         >
           {errorChannels.length === 0 ? null : (
-            <ul className="divide-y divide-ink-100">
+            <ul className="divide-y divide-ink-100 dark:divide-ink-800">
               {errorChannels.slice(0, 8).map((c) => (
                 <li key={c.id} className="py-2 flex items-center justify-between gap-3">
                   <Link
@@ -198,7 +198,7 @@ export default async function Dashboard() {
           empty="All channels are STARTED."
         >
           {downChannels.length === 0 ? null : (
-            <ul className="divide-y divide-ink-100">
+            <ul className="divide-y divide-ink-100 dark:divide-ink-800">
               {downChannels.slice(0, 8).map((c) => (
                 <li key={c.id} className="py-2 flex items-center justify-between gap-3">
                   <Link
@@ -216,10 +216,10 @@ export default async function Dashboard() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-ink-900 mb-3">
+        <h2 className="text-lg font-semibold text-ink-900 dark:text-ink-100 mb-3">
           Hottest channels (live throughput)
         </h2>
-        <div className="bg-white rounded-lg border border-ink-200 overflow-hidden">
+        <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 overflow-hidden">
           <table className="dense w-full">
             <thead>
               <tr>
@@ -274,7 +274,7 @@ export default async function Dashboard() {
                             ariaLabel={`Throughput sparkline for ${c.name}`}
                           />
                         ) : (
-                          <span className="text-xs text-ink-400 italic">collecting…</span>
+                          <span className="text-xs text-ink-400 dark:text-ink-500 italic">collecting…</span>
                         )}
                       </td>
                       <td className="text-right tabular-nums">
@@ -317,9 +317,9 @@ function Panel({
   empty: string
 }) {
   return (
-    <div className="bg-white rounded-lg border border-ink-200 p-4">
-      <h3 className="text-sm font-semibold text-ink-900 mb-2">{title}</h3>
-      {children ?? <div className="text-sm text-ink-600">{empty}</div>}
+    <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-4">
+      <h3 className="text-sm font-semibold text-ink-900 dark:text-ink-100 mb-2">{title}</h3>
+      {children ?? <div className="text-sm text-ink-600 dark:text-ink-400">{empty}</div>}
     </div>
   )
 }
@@ -331,7 +331,7 @@ function InterfaceTile({ bucket }: { bucket: InterfaceBucket }) {
     bucket.startedCount < bucket.channels.length
   return (
     <article
-      className={`bg-white rounded-lg border-2 p-4 ${
+      className={`bg-white dark:bg-ink-800 rounded-lg border-2 p-4 ${
         issues ? "border-amber-300" : "border-ink-200"
       }`}
     >
@@ -341,11 +341,11 @@ function InterfaceTile({ bucket }: { bucket: InterfaceBucket }) {
         >
           {bucket.type}
         </span>
-        <span className="text-xs text-ink-600">
+        <span className="text-xs text-ink-600 dark:text-ink-400">
           {bucket.startedCount} / {bucket.channels.length} STARTED
         </span>
       </div>
-      <div className="text-xs text-ink-600 mb-3 min-h-[2.5rem]">{bucket.impact}</div>
+      <div className="text-xs text-ink-600 dark:text-ink-400 mb-3 min-h-[2.5rem]">{bucket.impact}</div>
       <div className="grid grid-cols-4 gap-2 text-xs">
         <Metric label="Recv" value={bucket.totalReceived.toLocaleString()} />
         <Metric label="Sent" value={bucket.totalSent.toLocaleString()} tone="good" />
@@ -367,7 +367,7 @@ function InterfaceTile({ bucket }: { bucket: InterfaceBucket }) {
         />
       </div>
       <details className="mt-3 text-xs">
-        <summary className="cursor-pointer text-ink-600 hover:text-ink-900">
+        <summary className="cursor-pointer text-ink-600 dark:text-ink-400 hover:text-ink-900 dark:hover:text-ink-100">
           {bucket.channels.length} channel{bucket.channels.length === 1 ? "" : "s"}
         </summary>
         <ul className="mt-2 space-y-1">
@@ -407,7 +407,7 @@ function Metric({
           : "text-ink-800"
   return (
     <div className="flex flex-col">
-      <span className="text-[10px] uppercase tracking-wide text-ink-600">{label}</span>
+      <span className="text-[10px] uppercase tracking-wide text-ink-600 dark:text-ink-400">{label}</span>
       <span className={`font-mono font-semibold tabular-nums ${cls}`}>{value}</span>
     </div>
   )

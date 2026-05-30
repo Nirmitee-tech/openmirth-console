@@ -96,12 +96,12 @@ export function PipelineDiagram({ channel, failuresByConnector = {}, stepCounts 
   // Vertical arrangement scales the same on mobile.
 
   return (
-    <div className="bg-white rounded-lg border border-ink-200 p-4">
+    <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-ink-900 uppercase tracking-wide">
+        <h2 className="text-sm font-semibold text-ink-900 dark:text-ink-100 uppercase tracking-wide">
           Message pipeline
         </h2>
-        <div className="text-xs text-ink-600 flex items-center gap-3">
+        <div className="text-xs text-ink-600 dark:text-ink-400 flex items-center gap-3">
           <Legend tone="ok"   label="Healthy" />
           <Legend tone="warn" label="Warn" />
           <Legend tone="bad"  label="Errors" />
@@ -160,7 +160,7 @@ export function PipelineDiagram({ channel, failuresByConnector = {}, stepCounts 
         {/* Destinations */}
         <div className="space-y-2">
           {destinations.length === 0 ? (
-            <div className="text-sm text-ink-600 italic px-3 py-2">No destinations configured.</div>
+            <div className="text-sm text-ink-600 dark:text-ink-400 italic px-3 py-2">No destinations configured.</div>
           ) : (
             destinations.map((d) => (
               <DestinationCard
@@ -315,7 +315,7 @@ function Legend({ tone, label }: { tone: Tone; label: string }) {
 
 function Arrow({ fanOut = false }: { fanOut?: boolean }) {
   return (
-    <div className="hidden lg:flex items-center justify-center text-ink-400 text-xl select-none">
+    <div className="hidden lg:flex items-center justify-center text-ink-400 dark:text-ink-500 text-xl select-none">
       {fanOut ? "⇒" : "→"}
     </div>
   )

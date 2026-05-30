@@ -98,14 +98,14 @@ export default async function ChannelDetail({
           >
             ← All channels
           </Link>
-          <h1 className="text-2xl font-semibold text-ink-900">{channel.name}</h1>
+          <h1 className="text-2xl font-semibold text-ink-900 dark:text-ink-100">{channel.name}</h1>
           {channel.description ? (
-            <p className="text-sm text-ink-600 max-w-3xl">{channel.description}</p>
+            <p className="text-sm text-ink-600 dark:text-ink-400 max-w-3xl">{channel.description}</p>
           ) : null}
-          <div className="flex items-center gap-3 text-sm text-ink-600">
+          <div className="flex items-center gap-3 text-sm text-ink-600 dark:text-ink-400">
             <StateBadge state={channel.state} />
             <span>Revision {channel.revision}</span>
-            <code className="text-xs bg-ink-100 px-1.5 py-0.5 rounded">{channel.id}</code>
+            <code className="text-xs bg-ink-100 dark:bg-ink-700 px-1.5 py-0.5 rounded">{channel.id}</code>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -117,7 +117,7 @@ export default async function ChannelDetail({
           </Link>
           <Link
             href={`/channels/${channel.id}/messages`}
-            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 bg-white hover:bg-ink-50 text-ink-900"
+            className="text-sm font-medium px-3 py-1.5 rounded border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:bg-ink-50 dark:hover:bg-ink-700 text-ink-900 dark:text-ink-100"
           >
             Browse messages →
           </Link>
@@ -158,12 +158,12 @@ export default async function ChannelDetail({
 
       {/* Throughput sparkline */}
       {history && history.rates.length > 1 ? (
-        <section className="bg-white rounded-lg border border-ink-200 p-4">
+        <section className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-4">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-ink-900 uppercase tracking-wide">
+            <h2 className="text-sm font-semibold text-ink-900 dark:text-ink-100 uppercase tracking-wide">
               Throughput (last ~5 min, msg/s)
             </h2>
-            <span className="text-xs text-ink-600">
+            <span className="text-xs text-ink-600 dark:text-ink-400">
               avg {(history.rates.reduce((a, b) => a + b, 0) / history.rates.length).toFixed(2)} ·
               {" "}peak {Math.max(...history.rates).toFixed(2)}
             </span>
@@ -180,8 +180,8 @@ export default async function ChannelDetail({
       />
 
       {/* Actions */}
-      <section className="bg-white rounded-lg border border-ink-200 p-4">
-        <h2 className="text-sm font-semibold text-ink-900 uppercase tracking-wide mb-3">
+      <section className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-4">
+        <h2 className="text-sm font-semibold text-ink-900 dark:text-ink-100 uppercase tracking-wide mb-3">
           Lifecycle actions
         </h2>
         <ChannelActions
@@ -195,16 +195,16 @@ export default async function ChannelDetail({
 
       {/* Failure breakdown */}
       <section>
-        <h2 className="text-lg font-semibold text-ink-900 mb-3">
+        <h2 className="text-lg font-semibold text-ink-900 dark:text-ink-100 mb-3">
           Failures in the last {recentMessages.length} messages
         </h2>
         {failures.totalErrors === 0 && failures.totalQueued === 0 ? (
-          <div className="bg-white rounded-lg border border-ink-200 p-6 text-sm text-ink-600">
+          <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-6 text-sm text-ink-600 dark:text-ink-400">
             No errors or queued messages in the recent window. 🎉
           </div>
         ) : (
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg border border-ink-200 overflow-hidden">
+            <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 overflow-hidden">
               <table className="dense w-full">
                 <thead>
                   <tr>
@@ -218,12 +218,12 @@ export default async function ChannelDetail({
                   {failures.byConnector.map((c) => (
                     <tr key={c.metaDataId}>
                       <td>
-                        <div className="text-xs text-ink-600">
+                        <div className="text-xs text-ink-600 dark:text-ink-400">
                           {c.metaDataId === 0 ? "Source" : `Destination ${c.metaDataId}`}
                         </div>
-                        <div className="font-medium text-ink-900">{c.connectorName || "—"}</div>
+                        <div className="font-medium text-ink-900 dark:text-ink-100">{c.connectorName || "—"}</div>
                       </td>
-                      <td className="text-xs text-ink-700">
+                      <td className="text-xs text-ink-700 dark:text-ink-300">
                         {c.worstStage ? STAGE_LABEL[c.worstStage] : "—"}
                       </td>
                       <td
@@ -242,10 +242,10 @@ export default async function ChannelDetail({
               </table>
             </div>
 
-            <div className="bg-white rounded-lg border border-ink-200 p-4 space-y-3">
-              <h3 className="text-sm font-semibold text-ink-900">Recent errors</h3>
+            <div className="bg-white dark:bg-ink-800 rounded-lg border border-ink-200 dark:border-ink-700 p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-ink-900 dark:text-ink-100">Recent errors</h3>
               {failures.recentErrors.length === 0 ? (
-                <div className="text-sm text-ink-600 italic">
+                <div className="text-sm text-ink-600 dark:text-ink-400 italic">
                   Only queue backlog, no hard errors.
                 </div>
               ) : (
@@ -259,8 +259,8 @@ export default async function ChannelDetail({
                         >
                           #{e.messageId}
                         </Link>
-                        <span className="text-ink-600">{formatTime(e.receivedAt)}</span>
-                        <span className="text-ink-700">— {e.connectorName}</span>
+                        <span className="text-ink-600 dark:text-ink-400">{formatTime(e.receivedAt)}</span>
+                        <span className="text-ink-700 dark:text-ink-300">— {e.connectorName}</span>
                       </div>
                       {e.excerpt ? (
                         <pre className="mt-1 bg-ink-900 text-ink-50 rounded px-2 py-1.5 font-mono overflow-x-auto whitespace-pre-wrap break-words">
