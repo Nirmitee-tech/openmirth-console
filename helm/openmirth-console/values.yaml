@@ -1,0 +1,105 @@
+# Default values for openmirth-console.
+
+image:
+  repository: ghcr.io/nirmitee-tech/openmirth-console
+  tag: ""              # Defaults to Chart.appVersion when empty
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+# Mirth Connect connection — REQUIRED.
+# Credentials must be supplied via the secret referenced below.
+mirth:
+  url: "https://mirth-connect.mirth.svc.cluster.local:8443"
+  existingSecret: "openmirth-console-mirth"   # must contain: user, pass
+  # Mount your Mirth CA so the connection verifies properly. Strongly
+  # recommended in production. If empty, falls back to system trust store.
+  caConfigMap: ""
+  # NEVER set to true in production. The chart fails to render if
+  # set to true with values.global.environment=production.
+  insecureSkipVerify: false
+
+# Session encryption — must be 32+ random chars in a secret you create:
+#   kubectl create secret generic openmirth-console-session \
+#     --from-literal=password=$(openssl rand -hex 32)
+session:
+  existingSecret: "openmirth-console-session" # must contain: password
+  cookieName: "openmirth_session"
+  ttlSeconds: 28800  # 8 hours
+
+# Optional embed targets
+grafanaUrl: ""
+catalogUrl: ""
+
+env:
+  NODE_ENV: production
+  LOG_LEVEL: info
+
+service:
+  type: ClusterIP
+  port: 3030
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+  hosts:
+    - host: console.example.com
+      paths: [{ path: "/", pathType: Prefix }]
+  tls:
+    - secretName: openmirth-console-tls
+      hosts: [console.example.com]
+
+# Production-grade pod security defaults
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+
+# Restrict pod-to-pod traffic to only what the console needs.
+networkPolicy:
+  enabled: true
+  # Allow incoming from the ingress controller
+  ingressFromNamespaces:
+    - ingress-nginx
+  # Allow outgoing to Mirth + Prometheus + DNS
+  egressMirthNamespace: "mirth"
+
+# ServiceMonitor for the Prometheus operator
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+global:
+  environment: production

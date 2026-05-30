@@ -1,0 +1,19 @@
+apiVersion: v2
+name: openmirth-console
+description: Open-source operations layer for Mirth Connect — modern web admin and clinical observability
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://github.com/Nirmitee-tech/openmirth-console
+sources:
+  - https://github.com/Nirmitee-tech/openmirth-console
+maintainers:
+  - name: Nirmitee.io
+    email: hello@nirmitee.io
+    url: https://nirmitee.io
+keywords:
+  - mirth-connect
+  - healthcare
+  - interoperability
+  - hl7
+  - fhir

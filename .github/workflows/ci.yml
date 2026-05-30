@@ -1,0 +1,192 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Lint + Typecheck + Unit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.18
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - name: Vitest unit (with coverage)
+        env:
+          SESSION_PASSWORD: abcdefghijklmnopqrstuvwxyz1234567890
+          MIRTH_URL: https://placeholder.invalid:8443
+          MIRTH_USER: ci
+          MIRTH_PASS: ci
+        run: npm run test:coverage
+
+  integration:
+    name: Integration tests vs live Mirth
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      mirth-db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: mirthdb
+          POSTGRES_USER: mirthdb
+          POSTGRES_PASSWORD: mirthdb
+        options: >-
+          --health-cmd "pg_isready -U mirthdb"
+          --health-interval 5s
+          --health-retries 10
+        ports:
+          - 5433:5432
+      mirth:
+        image: nextgenhealthcare/connect:4.5.2
+        env:
+          DATABASE: postgres
+          DATABASE_URL: jdbc:postgresql://mirth-db:5432/mirthdb
+          DATABASE_USERNAME: mirthdb
+          DATABASE_PASSWORD: mirthdb
+          VMOPTIONS: "-Xmx512m"
+        ports:
+          - 8443:8443
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.18
+          cache: npm
+      - run: npm ci
+      - name: Wait for Mirth
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sk -u admin:admin -H "X-Requested-With: OpenAPI" -o /dev/null -w "%{http_code}" "https://localhost:8443/api/server/version" | grep -q "200"; then
+              echo "Mirth ready after ${i}s"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Mirth never came up"; exit 1
+      - name: Run integration suite
+        env:
+          SESSION_PASSWORD: abcdefghijklmnopqrstuvwxyz1234567890
+          MIRTH_URL: https://localhost:8443
+          MIRTH_USER: admin
+          MIRTH_PASS: admin
+          MIRTH_INSECURE_SKIP_VERIFY: "true"
+          NODE_ENV: test
+        run: npm run test:integration
+
+  e2e:
+    name: Playwright E2E vs live Mirth
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      mirth-db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: mirthdb
+          POSTGRES_USER: mirthdb
+          POSTGRES_PASSWORD: mirthdb
+        options: >-
+          --health-cmd "pg_isready -U mirthdb"
+          --health-interval 5s
+          --health-retries 10
+      mirth:
+        image: nextgenhealthcare/connect:4.5.2
+        env:
+          DATABASE: postgres
+          DATABASE_URL: jdbc:postgresql://mirth-db:5432/mirthdb
+          DATABASE_USERNAME: mirthdb
+          DATABASE_PASSWORD: mirthdb
+        ports:
+          - 8443:8443
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.18
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox
+      - name: Wait for Mirth
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sk -u admin:admin -H "X-Requested-With: OpenAPI" -o /dev/null -w "%{http_code}" "https://localhost:8443/api/server/version" | grep -q "200"; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Mirth not ready"; exit 1
+      - name: Build app
+        env:
+          SESSION_PASSWORD: abcdefghijklmnopqrstuvwxyz1234567890
+          MIRTH_URL: https://localhost:8443
+          MIRTH_USER: admin
+          MIRTH_PASS: admin
+        run: npm run build
+      - name: Start app
+        env:
+          SESSION_PASSWORD: abcdefghijklmnopqrstuvwxyz1234567890
+          MIRTH_URL: https://localhost:8443
+          MIRTH_USER: admin
+          MIRTH_PASS: admin
+          MIRTH_INSECURE_SKIP_VERIFY: "true"
+          PORT: 3030
+          NODE_ENV: production
+        run: |
+          npm run start &
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:3030/api/healthz > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo "App did not start"; exit 1
+      - name: Playwright
+        env:
+          CI: "true"
+          E2E_BASE_URL: http://localhost:3030
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 14
+
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    needs: [static]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: openmirth-console:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  helm-lint:
+    name: Helm chart lint + template
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.4
+      - run: helm lint ./helm/openmirth-console
+      - run: helm template ./helm/openmirth-console > /dev/null

@@ -1,0 +1,76 @@
+{
+  "name": "openmirth-console",
+  "version": "0.1.0",
+  "private": false,
+  "license": "Apache-2.0",
+  "description": "The open-source operations layer for Mirth Connect and OIE — modern web admin, clinical observability, channel CI/CD.",
+  "homepage": "https://github.com/Nirmitee-tech/openmirth-console",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nirmitee-tech/openmirth-console.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nirmitee-tech/openmirth-console/issues"
+  },
+  "author": "Nirmitee.io <hello@nirmitee.io> (https://nirmitee.io)",
+  "keywords": [
+    "mirth-connect",
+    "open-integration-engine",
+    "healthcare-integration",
+    "hl7",
+    "fhir",
+    "interoperability",
+    "monitoring",
+    "observability",
+    "healthcare-it"
+  ],
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "overrides": {
+    "postcss": "8.5.15"
+  },
+  "scripts": {
+    "dev": "next dev -p 3030",
+    "build": "next build",
+    "start": "next start -p 3030",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:coverage": "vitest run --coverage",
+    "check": "npm run typecheck && npm run lint && npm run test"
+  },
+  "dependencies": {
+    "fast-xml-parser": "5.8.0",
+    "iron-session": "8.0.4",
+    "next": "15.5.18",
+    "pino": "10.3.1",
+    "pino-pretty": "13.1.3",
+    "prom-client": "15.1.3",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "undici": "6.26.0",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@playwright/test": "1.60.0",
+    "@types/node": "20.14.2",
+    "@types/react": "19.2.15",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "4.3.4",
+    "@vitest/coverage-v8": "4.1.7",
+    "autoprefixer": "10.4.20",
+    "eslint": "9.39.1",
+    "eslint-config-next": "15.5.18",
+    "jsdom": "25.0.1",
+    "postcss": "8.5.15",
+    "tailwindcss": "3.4.15",
+    "typescript": "5.6.3",
+    "vitest": "4.1.7"
+  }
+}

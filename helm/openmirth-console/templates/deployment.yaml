@@ -1,0 +1,123 @@
+{{- if and (eq .Values.global.environment "production") .Values.mirth.insecureSkipVerify }}
+{{- fail "mirth.insecureSkipVerify=true is forbidden in production. Mount your Mirth CA via mirth.caConfigMap instead." }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openmirth-console.fullname" . }}
+  labels:
+    {{- include "openmirth-console.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "openmirth-console.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        {{- include "openmirth-console.selectorLabels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/api/metrics"
+        prometheus.io/port: "3030"
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: console
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3030
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "3030"
+            - name: NODE_ENV
+              value: {{ .Values.env.NODE_ENV | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.env.LOG_LEVEL | quote }}
+            - name: MIRTH_URL
+              value: {{ .Values.mirth.url | quote }}
+            - name: MIRTH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mirth.existingSecret }}
+                  key: user
+            - name: MIRTH_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mirth.existingSecret }}
+                  key: pass
+            {{- if .Values.mirth.caConfigMap }}
+            - name: MIRTH_CA_FILE
+              value: /etc/mirth-ca/mirth-ca.pem
+            {{- end }}
+            - name: SESSION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.session.existingSecret }}
+                  key: password
+            - name: SESSION_COOKIE_NAME
+              value: {{ .Values.session.cookieName | quote }}
+            - name: SESSION_TTL_SECONDS
+              value: {{ .Values.session.ttlSeconds | quote }}
+            {{- if .Values.grafanaUrl }}
+            - name: GRAFANA_URL
+              value: {{ .Values.grafanaUrl | quote }}
+            {{- end }}
+            {{- if .Values.catalogUrl }}
+            - name: CATALOG_URL
+              value: {{ .Values.catalogUrl | quote }}
+            {{- end }}
+          livenessProbe:
+            httpGet: { path: /api/healthz, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet: { path: /api/readyz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+            # Next.js standalone runtime needs writable /tmp for cache.
+            - name: tmp
+              mountPath: /tmp
+            - name: next-cache
+              mountPath: /app/.next/cache
+            {{- if .Values.mirth.caConfigMap }}
+            - name: mirth-ca
+              mountPath: /etc/mirth-ca
+              readOnly: true
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: { medium: Memory, sizeLimit: 64Mi }
+        - name: next-cache
+          emptyDir: { sizeLimit: 256Mi }
+        {{- if .Values.mirth.caConfigMap }}
+        - name: mirth-ca
+          configMap:
+            name: {{ .Values.mirth.caConfigMap }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}

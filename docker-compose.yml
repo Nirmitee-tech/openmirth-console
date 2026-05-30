@@ -1,0 +1,70 @@
+# One-command local demo of OpenMirth Console pointed at a real Mirth
+# Connect 4.5.2 instance + Postgres.
+#
+# Usage:
+#   1. cp .env.example .env  # then set SESSION_PASSWORD to a 32+ char random string
+#   2. docker compose up -d
+#   3. Open http://localhost:3030 — sign in with admin/admin
+#
+# For production deployment use the Helm chart at ./helm/openmirth-console
+# instead of this compose file.
+
+services:
+  mirth-db:
+    image: postgres:16-alpine
+    container_name: openmirth-mirth-db
+    environment:
+      POSTGRES_DB: mirthdb
+      POSTGRES_USER: mirthdb
+      POSTGRES_PASSWORD: mirthdb
+    volumes:
+      - mirth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mirthdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mirth:
+    image: nextgenhealthcare/connect:4.5.2
+    container_name: openmirth-mirth
+    depends_on:
+      mirth-db:
+        condition: service_healthy
+    environment:
+      DATABASE: postgres
+      DATABASE_URL: jdbc:postgresql://mirth-db:5432/mirthdb
+      DATABASE_USERNAME: mirthdb
+      DATABASE_PASSWORD: mirthdb
+      VMOPTIONS: "-Xmx512m"
+    ports:
+      - "8443:8443"
+    volumes:
+      - mirth-appdata:/opt/connect/appdata
+    restart: unless-stopped
+
+  console:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openmirth-console
+    depends_on:
+      - mirth
+    environment:
+      # MUST be a 32+ char random string. Generate with:
+      #   openssl rand -hex 32
+      SESSION_PASSWORD: ${SESSION_PASSWORD}
+      MIRTH_URL: https://mirth:8443
+      MIRTH_USER: admin
+      MIRTH_PASS: admin
+      # Local-demo only — production must use MIRTH_CA_FILE
+      MIRTH_INSECURE_SKIP_VERIFY: "true"
+      NODE_ENV: production
+      LOG_LEVEL: info
+    ports:
+      - "3030:3030"
+    restart: unless-stopped
+
+volumes:
+  mirth-db-data:
+  mirth-appdata:
